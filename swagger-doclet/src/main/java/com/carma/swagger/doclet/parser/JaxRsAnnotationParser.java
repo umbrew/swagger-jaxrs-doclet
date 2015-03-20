@@ -136,14 +136,30 @@ public class JaxRsAnnotationParser {
 			}
 			Collection<ApiDeclaration> declarationColl = resourceToDeclaration.values();
 
-			declarations = new ArrayList<ApiDeclaration>(declarationColl);
+			// add any extra declarations
+			if (this.options.getExtraApiDeclarations() != null && !this.options.getExtraApiDeclarations().isEmpty()) {
+				declarationColl = new ArrayList<ApiDeclaration>(declarationColl);
+				declarationColl.addAll(this.options.getExtraApiDeclarations());
+			}
+
+			// set root path on any empty resources
+			for (ApiDeclaration api : declarationColl) {
+				if (api.getResourcePath() == null || api.getResourcePath().isEmpty() || api.getResourcePath().equals("/")) {
+					api.setResourcePath(this.options.getResourceRootPath());
+				}
+			}
+
+			// merge the api declarations
+			declarationColl = new ApiDeclarationMerger(SWAGGER_VERSION, this.options.getApiVersion(), this.options.getApiBasePath()).merge(declarationColl);
 
 			// clear any empty models
-			for (ApiDeclaration api : declarations) {
+			for (ApiDeclaration api : declarationColl) {
 				if (api.getModels() != null && api.getModels().isEmpty()) {
 					api.setModels(null);
 				}
 			}
+
+			declarations = new ArrayList<ApiDeclaration>(declarationColl);
 
 			// sort the api declarations if needed
 			if (this.options.isSortResourcesByPriority()) {
@@ -208,10 +224,6 @@ public class JaxRsAnnotationParser {
 		File outputDirectory = this.options.getOutputDirectory();
 		Recorder recorder = this.options.getRecorder();
 		for (ApiDeclaration api : apis) {
-			// empty resource paths map to the root
-			if (api.getResourcePath() == null || api.getResourcePath().isEmpty() || api.getResourcePath().equals("/")) {
-				api.setResourcePath(this.options.getResourceRootPath());
-			}
 			String resourcePath = api.getResourcePath();
 			if (!Strings.isNullOrEmpty(resourcePath)) {
 				String resourceName = resourcePath.replaceFirst("/", "").replaceAll("/", "_").replaceAll("[\\{\\}]", "");

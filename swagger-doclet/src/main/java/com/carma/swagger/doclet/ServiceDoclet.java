@@ -105,8 +105,11 @@ public class ServiceDoclet {
 		options.put("-requiredFieldAnnotations", 2);
 		options.put("-optionalFieldAnnotations", 2);
 
+		// file inclusions
 		options.put("-apiAuthorizationsFile", 2);
 		options.put("-apiInfoFile", 2);
+		options.put("-extraApiDeclarations", 2);
+
 		options.put("-unauthOperationTags", 2);
 		options.put("-authOperationTags", 2);
 		options.put("-unauthOperationTagValues", 2);

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Properties;
 
 import com.carma.swagger.doclet.model.ApiAuthorizations;
+import com.carma.swagger.doclet.model.ApiDeclaration;
 import com.carma.swagger.doclet.model.ApiInfo;
 import com.carma.swagger.doclet.parser.NamingConvention;
 import com.carma.swagger.doclet.parser.ParserHelper;
@@ -34,7 +35,7 @@ public class DocletOptions {
 
 	private static <T> T loadModelFromJson(String option, String path, Class<T> resourceClass) {
 		File file = new File(path);
-		checkArgument(file.isFile(), "Path after " + option + " (" + file.getAbsolutePath() + ") is expected to be an existing file!");
+		checkArgument(file.isFile(), "Path for " + option + " (" + file.getAbsolutePath() + ") is expected to be an existing file!");
 		// load it as json and build the object from it
 		InputStream is = null;
 		try {
@@ -81,6 +82,19 @@ public class DocletOptions {
 				parsedOptions.apiAuthorizations = loadModelFromJson("-apiAuthorizationsFile", option[1], ApiAuthorizations.class);
 			} else if (option[0].equals("-apiInfoFile")) {
 				parsedOptions.apiInfo = loadModelFromJson("-apiInfoFile", option[1], ApiInfo.class);
+
+			} else if (option[0].equals("-extraApiDeclarations")) {
+				List<ApiDeclaration> extraApiDeclarations = new ArrayList<ApiDeclaration>();
+				String[] filePaths = option[1].split(",");
+				for (String filePath : filePaths) {
+					filePath = filePath.trim();
+					ApiDeclaration api = loadModelFromJson("-apiAuthorizationsFile", filePath, ApiDeclaration.class);
+					extraApiDeclarations.add(api);
+				}
+				if (!extraApiDeclarations.isEmpty()) {
+					parsedOptions.extraApiDeclarations = extraApiDeclarations;
+				}
+
 			} else if (option[0].equals("-variablesPropertiesFile")) {
 
 				File varFile = new File(option[1]);
@@ -368,6 +382,8 @@ public class DocletOptions {
 	private ApiAuthorizations apiAuthorizations;
 
 	private ApiInfo apiInfo;
+
+	private List<ApiDeclaration> extraApiDeclarations;
 
 	private Recorder recorder;
 	private Translator translator;
@@ -1397,6 +1413,23 @@ public class DocletOptions {
 	 */
 	public DocletOptions setApiInfo(ApiInfo apiInfo) {
 		this.apiInfo = apiInfo;
+		return this;
+	}
+
+	/**
+	 * This gets the extraApiDeclarations
+	 * @return the extraApiDeclarations
+	 */
+	public List<ApiDeclaration> getExtraApiDeclarations() {
+		return this.extraApiDeclarations;
+	}
+
+	/**
+	 * This sets the extraApiDeclarations
+	 * @param extraApiDeclarations the extraApiDeclarations to set
+	 */
+	public DocletOptions setExtraApiDeclarations(List<ApiDeclaration> extraApiDeclarations) {
+		this.extraApiDeclarations = extraApiDeclarations;
 		return this;
 	}
 

@@ -113,7 +113,7 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
                             <docletArtifact>
                                 <groupId>com.carma</groupId>
 								<artifactId>swagger-doclet</artifactId>
-        						<version>1.0.4.1</version>
+        						<version>1.0.4.2</version>
         					</docletArtifact>
                             <reportOutputDirectory>${project.build.outputDirectory}</reportOutputDirectory>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
@@ -150,7 +150,7 @@ Here is an example build.gradle file that will generate the swagger JSON files i
 
 dependencies {
     doclet(
-        [group: 'com.carma', name: 'swagger-doclet', version: '1.0.4.1'],
+        [group: 'com.carma', name: 'swagger-doclet', version: '1.0.4.2'],
         [group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0']
     ) 
 }
@@ -398,7 +398,8 @@ These are the options that you may want to use to add additional functionality o
 <table>
 	<tr><th>Option</th><th>Purpose</th></tr>
 	<tr><td>-d</td><td>The path to the directory where the generated swagger json files should be written e.g. -d /tmp/foo. By default this will be the reportOutputDirectory of the doclet.</td></tr>
-	<tr><td>-apiAuthorizationsFile</td><td>The path to the json include file that contains the authorizations spec that should be included in the generated json. For example for Carma we use: 
+	
+	<tr><td>-apiAuthorizationsFile</td><td>The path to the json include file that contains the authorizations spec that should be included in the generated json. NOTE wrap the path in single qoutes to escape spaces. For example for Carma we use: 
 	<p></p>
 	<p>-apiAuthorizationsFile ${project.build.directory}/swagger/includes/apiauth.json</p>
 	
@@ -428,7 +429,7 @@ These are the options that you may want to use to add additional functionality o
 	</pre></code>
 	</td></tr>
 	
-	<tr><td>-apiInfoFile</td><td>The path to the json include file that contains the Info that should be included in the generated json. NOTE wrap this in single qoutes to escape spaces. For example for Carma we use: 
+	<tr><td>-apiInfoFile</td><td>The path to the json include file that contains the Info that should be included in the generated json. NOTE wrap the path in single qoutes to escape spaces. For example for Carma we use: 
 	<p></p>
 	<p>-apiInfoFile ${project.build.directory}/swagger/includes/apiinfo.json</p>
 	
@@ -447,6 +448,115 @@ These are the options that you may want to use to add additional functionality o
 	</td></tr>
 	
 	
+	<tr><td>-extraApiDeclarations</td><td>A CSV of paths to json include files that contains the definitions of extra apis that should be included in the generated json. NOTE wrap the CSV of paths in single qoutes to escape spaces. For example for Carma we use: 
+	<p></p>
+	<p>-extraApiDeclarations ${project.build.directory}/swagger/includes/oauth.json</p>
+	
+	which includes this content:
+	
+	<code><pre>
+	{
+	"basePath": "/",
+    "resourcePath": "/login",
+    "apis": [
+        {
+            "path": "/security/oauth/token/pw",
+            "operations": [
+                {
+                    "method": "POST",
+                    "nickname": "getTokenPasswordFlow",
+                    "type": "Token",
+                    "summary": "Password Authentication",
+                    "notes": "This is the Oauth 2.0 Password flow which allows you to provide your client application credentials and the user's login credentials and receive back an Oauth token for the user. This is only available to certain trusted clients.",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "client_id",
+                            "type": "string",
+                            "required" : true
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "client_secret",
+                            "type": "string",
+                            "required" : true
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "username",
+                            "type": "string",
+                            "required" : true
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "password",
+                            "type": "string",
+                            "required" : true
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "grant_type",
+                            "type": "string",
+                            "required" : true,
+                            "enum": [
+						        "password"
+						    	],
+						    "defaultValue" : "password"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "scope",
+                            "type": "string",
+                            "required" : true,
+                            "enum": [
+						        "rtr",
+						        "rtr,rtr-restricted"
+						    	],
+						    "defaultValue" : "rtr"
+                        }
+                    ],
+                    "produces": ["application/json"],
+                    "responseMessages": [
+                    	{
+						    "code": 200,
+						    "message": "Authentication was successful."
+						},
+						{
+						    "code": 401,
+						    "message": "Authentication failed."
+						}
+                    ]
+                }                
+            ]
+        }
+    ],
+    "models": {
+        "Token": {
+            "id": "Token",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "uid": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "scope": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
+		</pre></code>
+	</td></tr>
 	
 	<tr><td>-variablesPropertiesFile</td><td>Path to a properties file that holds variable replacements which can be referenced in java doc. For example if a method description contains ${userFieldNamesDesc} and this properties file had a property set like this:<br>
 
