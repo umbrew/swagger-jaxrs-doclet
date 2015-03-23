@@ -57,7 +57,7 @@ public class ApiDeclarationMerger {
 				String apiVersion = getFirstNonNull(this.apiVersion, declaration.getApiVersion());
 				String swaggerVersion = getFirstNonNull(this.swaggerVersion, declaration.getSwaggerVersion());
 				String basePath = getFirstNonNull(this.basePath, declaration.getBasePath());
-				Integer priority = getFirstNonNull(0, declaration.getPriority());
+				int priority = getFirstNonNullNorVal(Integer.MAX_VALUE, Integer.MAX_VALUE, declaration.getPriority());
 
 				ApiDeclaration newApi = new ApiDeclaration(swaggerVersion, apiVersion, basePath, resourcePath, declaration.getApis(), declaration.getModels(),
 						priority, declaration.getDescription());
@@ -69,7 +69,7 @@ public class ApiDeclarationMerger {
 				String apiVersion = getFirstNonNull(this.apiVersion, existing.getApiVersion(), declaration.getApiVersion());
 				String swaggerVersion = getFirstNonNull(this.swaggerVersion, existing.getSwaggerVersion(), declaration.getSwaggerVersion());
 				String basePath = getFirstNonNull(this.basePath, existing.getBasePath(), declaration.getBasePath());
-				Integer priority = getFirstNonNull(0, existing.getPriority(), declaration.getPriority());
+				int priority = getFirstNonNullNorVal(Integer.MAX_VALUE, Integer.MAX_VALUE, existing.getPriority(), declaration.getPriority());
 				String description = getFirstNonNull(null, existing.getDescription(), declaration.getDescription());
 
 				List<Api> apis = existing.getApis();
@@ -137,6 +137,15 @@ public class ApiDeclarationMerger {
 	private <T> T getFirstNonNull(T defaultValue, T... vals) {
 		for (T val : vals) {
 			if (val != null) {
+				return val;
+			}
+		}
+		return defaultValue;
+	}
+
+	private <T> T getFirstNonNullNorVal(T defaultValue, T excludeVal, T... vals) {
+		for (T val : vals) {
+			if (val != null && !val.equals(excludeVal)) {
 				return val;
 			}
 		}

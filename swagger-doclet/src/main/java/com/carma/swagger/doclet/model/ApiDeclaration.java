@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @SuppressWarnings("javadoc")
@@ -114,6 +115,7 @@ public class ApiDeclaration {
 	 * This sets the priority
 	 * @param priority the priority to set
 	 */
+	@JsonProperty
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}

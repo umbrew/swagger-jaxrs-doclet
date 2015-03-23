@@ -31,6 +31,7 @@ public class IncludeApiDeclarationsTest {
 	public void setup() throws IOException {
 		this.recorderMock = mock(Recorder.class);
 		this.options = new DocletOptions().setRecorder(this.recorderMock).setIncludeSwaggerUi(false);
+		this.options.setSortResourcesByPriority(true);
 
 		final ApiDeclaration api1 = loadFixture("/fixtures/includeapideclarations/includedeclaration1.json", ApiDeclaration.class);
 		final ApiDeclaration api2 = loadFixture("/fixtures/includeapideclarations/includedeclaration2.json", ApiDeclaration.class);
@@ -55,6 +56,7 @@ public class IncludeApiDeclarationsTest {
 		verify(this.recorderMock).record(any(File.class), eq(expectedDeclaration1));
 
 		final ApiDeclaration expectedDeclaration2 = loadFixture("/fixtures/includeapideclarations/foo3.json", ApiDeclaration.class);
+		expectedDeclaration2.setPriority(5);
 		verify(this.recorderMock).record(any(File.class), eq(expectedDeclaration2));
 	}
 

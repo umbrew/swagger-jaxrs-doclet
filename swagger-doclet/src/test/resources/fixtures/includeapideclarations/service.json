@@ -3,10 +3,10 @@
     "swaggerVersion": "1.2",
     "apis": [
      	{
-            "path": "/foo.{format}"
-        },
-        {
             "path": "/foo3.{format}"
+        },
+     	{
+            "path": "/foo.{format}"
         }
     ]
 }

@@ -136,6 +136,7 @@ public class ApiMethodParser {
 	 * @param parentMethod
 	 * @param methodDoc
 	 * @param classes
+	 * @param typeClasses
 	 * @param classDefaultErrorType
 	 */
 	public ApiMethodParser(DocletOptions options, Method parentMethod, MethodDoc methodDoc, Collection<ClassDoc> classes, Collection<ClassDoc> typeClasses,
