@@ -13,6 +13,7 @@ public class Method {
 	private String returnType;
 	private String returnTypeItemsRef;
 	private String returnTypeItemsType;
+    private List<String> returnTypeItemsAllowableValues;
 	private String path;
 
 	private List<String> consumes;
@@ -27,7 +28,7 @@ public class Method {
 	}
 
 	public Method(HttpMethod method, String methodName, String path, List<ApiParameter> apiParameters, List<ApiResponseMessage> responseMessages,
-			String summary, String notes, String returnType, String returnTypeItemsRef, String returnTypeItemsType, List<String> consumes,
+			String summary, String notes, String returnType, String returnTypeItemsRef, String returnTypeItemsType, List<String> returnTypeItemsAllowableValues, List<String> consumes,
 			List<String> produces, OperationAuthorizations authorizations, boolean deprecated) {
 		this.method = method;
 		this.methodName = methodName;
@@ -39,6 +40,7 @@ public class Method {
 		this.returnType = returnType;
 		this.returnTypeItemsRef = returnTypeItemsRef;
 		this.returnTypeItemsType = returnTypeItemsType;
+        this.returnTypeItemsAllowableValues = returnTypeItemsAllowableValues;
 		this.consumes = consumes;
 		this.produces = produces;
 		this.authorizations = authorizations;
@@ -105,7 +107,11 @@ public class Method {
 		return this.returnTypeItemsType;
 	}
 
-	public boolean isSubResource() {
+    public List<String> getReturnTypeItemsAllowableValues() {
+        return returnTypeItemsAllowableValues;
+    }
+
+    public boolean isSubResource() {
 		return this.method == null;
 	}
 

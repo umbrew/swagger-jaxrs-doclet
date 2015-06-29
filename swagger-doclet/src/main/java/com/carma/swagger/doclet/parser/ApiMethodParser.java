@@ -202,6 +202,7 @@ public class ApiMethodParser {
 
 		String returnTypeItemsRef = null;
 		String returnTypeItemsType = null;
+        List<String> returnTypeItemsAllowableValues = null;
 		Type containerOf = ParserHelper.getContainerType(returnType, null);
 
 		Map<String, Type> varsToTypes = new HashMap<String, Type>();
@@ -209,12 +210,17 @@ public class ApiMethodParser {
 		if (containerOf != null) {
 			// its a collection, add the container of type to the model
 			modelType = containerOf;
-			// set the items type or ref
-			if (ParserHelper.isPrimitive(containerOf, this.options)) {
-				returnTypeItemsType = this.translator.typeName(containerOf).value();
-			} else {
-				returnTypeItemsRef = this.translator.typeName(containerOf, viewClasses).value();
-			}
+            returnTypeItemsAllowableValues = ParserHelper.getAllowableValues(containerOf.asClassDoc());
+            if (returnTypeItemsAllowableValues != null) {
+                returnTypeItemsType = "string";
+            } else {
+                // set the items type or ref
+                if (ParserHelper.isPrimitive(containerOf, this.options)) {
+                    returnTypeItemsType = this.translator.typeName(containerOf).value();
+                } else {
+                    returnTypeItemsRef = this.translator.typeName(containerOf, viewClasses).value();
+                }
+            }
 
 		} else {
 
@@ -293,7 +299,7 @@ public class ApiMethodParser {
 
 		// final result!
 		return new Method(this.httpMethod, this.methodDoc.name(), path, parameters, responseMessages, summary, notes, returnTypeName, returnTypeItemsRef,
-				returnTypeItemsType, consumes, produces, authorizations, deprecated);
+				returnTypeItemsType, returnTypeItemsAllowableValues, consumes, produces, authorizations, deprecated);
 	}
 
 	private OperationAuthorizations generateAuthorizations() {
@@ -563,9 +569,10 @@ public class ApiMethodParser {
 
 							String itemsRef = property.getItems() == null ? null : property.getItems().getRef();
 							String itemsType = property.getItems() == null ? null : property.getItems().getType();
+                            List<String> itemsAllowableValues = property.getItems() == null ? null : property.getItems().getAllowableValues();
 
 							ApiParameter param = new ApiParameter(property.getParamCategory(), renderedParamName, required, allowMultiple, property.getType(),
-									property.getFormat(), property.getDescription(), itemsRef, itemsType, property.getUniqueItems(),
+									property.getFormat(), property.getDescription(), itemsRef, itemsType, itemsAllowableValues, property.getUniqueItems(),
 									property.getAllowableValues(), property.getMinimum(), property.getMaximum(), property.getDefaultValue());
 
 							parameters.add(param);
@@ -591,6 +598,7 @@ public class ApiMethodParser {
 			List<String> allowableValues = null;
 			String itemsRef = null;
 			String itemsType = null;
+            List<String> itemsAllowableValues = null;
 			Boolean uniqueItems = null;
 			String minimum = null;
 			String maximum = null;
@@ -667,11 +675,16 @@ public class ApiMethodParser {
 				containerOf = ParserHelper.getContainerType(paramType, null);
 				String containerTypeOf = containerOf == null ? null : this.translator.typeName(containerOf).value();
 				if (containerOf != null) {
-					if (ParserHelper.isPrimitive(containerOf, this.options)) {
-						itemsType = containerTypeOf;
-					} else {
-						itemsRef = containerTypeOf;
-					}
+                    itemsAllowableValues = ParserHelper.getAllowableValues(containerOf.asClassDoc());
+                    if (itemsAllowableValues != null) {
+                        itemsType = "string";
+                    } else {
+                        if (ParserHelper.isPrimitive(containerOf, this.options)) {
+                            itemsType = containerTypeOf;
+                        } else {
+                            itemsRef = containerTypeOf;
+                        }
+                    }
 				}
 
 				if (typeName.equals("array")) {
@@ -692,7 +705,7 @@ public class ApiMethodParser {
 
 			// build parameter
 			ApiParameter param = new ApiParameter(paramCategory, renderedParamName, required, allowMultiple, typeName, format, description, itemsRef,
-					itemsType, uniqueItems, allowableValues, minimum, maximum, defaultVal);
+					itemsType, itemsAllowableValues, uniqueItems, allowableValues, minimum, maximum, defaultVal);
 
 			parameters.add(param);
 		}

@@ -3,6 +3,8 @@ package com.carma.swagger.doclet.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 
+import java.util.List;
+
 /**
  * The PropertyItemsObject represents an object that defines the items for a collections
  * @version $Id$
@@ -12,8 +14,9 @@ public class PropertyItems {
 
 	private String ref;
 	private String type;
+    private List<String> allowableValues;
 
-	/**
+    /**
 	 * This creates a PropertyItems
 	 */
 	public PropertyItems() {
@@ -25,10 +28,11 @@ public class PropertyItems {
 	 * @param ref
 	 * @param type
 	 */
-	public PropertyItems(String ref, String type) {
+	public PropertyItems(String ref, String type, List<String> allowableValues) {
 		super();
 		this.ref = ref;
 		this.type = type;
+        this.allowableValues = allowableValues;
 	}
 
 	/**
@@ -48,7 +52,10 @@ public class PropertyItems {
 		return this.type;
 	}
 
-	@Override
+    @JsonProperty("enum")
+    public List<String> getAllowableValues() { return this.allowableValues; }
+
+    @Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
@@ -71,7 +78,7 @@ public class PropertyItems {
 	 */
 	@Override
 	public String toString() {
-		return "PropertyItems [ref=" + this.ref + ", type=" + this.type + "]";
+		return "PropertyItems [ref=" + this.ref + ", type=" + this.type + ", allowableValues=" + this.allowableValues + "]";
 	}
 
 }
