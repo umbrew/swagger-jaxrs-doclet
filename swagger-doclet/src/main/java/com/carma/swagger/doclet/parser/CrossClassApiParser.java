@@ -23,6 +23,7 @@ import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.Tag;
 import com.sun.javadoc.Type;
+import java.util.List;
 
 /**
  * The CrossClassApiParser represents an api class parser that supports ApiDeclaration being
@@ -194,7 +195,7 @@ public class CrossClassApiParser {
 			}
 		}
 
-	}
+	}    
 
 	private String buildResourcePath(String classResourcePath, MethodDoc method) {
 		String resourcePath = getRootPath();
@@ -221,6 +222,7 @@ public class CrossClassApiParser {
 
 	private Map<String, Model> addApiModels(Set<Model> classModels, Set<Model> methodModels, MethodDoc method) {
 		methodModels.addAll(classModels);
+                methodModels = filterDuplicateSubtypeModels(methodModels);
 		Map<String, Model> idToModels = Collections.emptyMap();
 		try {
 			idToModels = uniqueIndex(methodModels, new Function<Model, String>() {
@@ -234,6 +236,30 @@ public class CrossClassApiParser {
 		}
 		return idToModels;
 	}
+        
+        /**
+         * Filters models for duplicates of subtype models.
+         * Duplicates occur if a subtype model is (transitively) referenced at the same time as its superclass model
+         * Two models will then be generated for the subtype, one with only the properties for the subtype, and one with properties for both the subtype and the superclass
+         * This method simply removes the latter.
+         * @param models The models to filter.
+         * @return The input with duplicates of subtypes removed.
+         */
+        private Set<Model> filterDuplicateSubtypeModels(Set<Model> models){
+            List<String> subtypeNames = new ArrayList<String>();
+            for(Model model : models){
+                if(model.isIsModelSubtype()){
+                    subtypeNames.add(model.getId());
+                }
+            }
+            Set<Model> res = new HashSet<Model>();
+            for(Model model : models){
+                if(!subtypeNames.contains(model.getId()) || model.isIsModelSubtype()){
+                    res.add(model);
+                }
+            }
+            return res;
+        }
 
 	private void setApiPriority(String classResourcePriority, MethodDoc method, ClassDoc currentClassDoc, ApiDeclaration declaration) {
 		int priorityVal = Integer.MAX_VALUE;

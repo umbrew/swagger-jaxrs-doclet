@@ -157,8 +157,8 @@ public class ApiModelParser {
 		// process sub types
 		for (ClassDoc subType : this.subTypeClasses) {
 			ApiModelParser subTypeParser = new ApiModelParser(this.options, this.translator, subType, false);
-			Set<Model> subTypeModesl = subTypeParser.parse();
-			this.models.addAll(subTypeModesl);
+			Set<Model> subTypeModels = subTypeParser.parse();
+			this.models.addAll(subTypeModels);
 		}
 
 		return this.models;
@@ -286,7 +286,7 @@ public class ApiModelParser {
 				}
 			}
 
-			this.models.add(new Model(modelId, elements, requiredFields, optionalFields, subTypes, discriminator));
+			this.models.add(new Model(modelId, elements, requiredFields, optionalFields, subTypes, !this.inheritFields, discriminator));
 			parseNestedModels(types.values());
 		}
 	}

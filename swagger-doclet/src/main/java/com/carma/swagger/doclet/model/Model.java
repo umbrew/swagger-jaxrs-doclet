@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The Model represents a description of an input or output entity or sub entity.
  * @version $Id$
  */
+@JsonIgnoreProperties({"isModelSubtype"})
 public class Model {
 
 	private String id;
@@ -17,6 +19,7 @@ public class Model {
 	private List<String> requiredFields;
 	private List<String> optionalFields;
 	private List<String> subTypes;
+        private boolean isModelSubtype;
 	private String discriminator;
 
 	/**
@@ -37,13 +40,29 @@ public class Model {
 	 */
 	public Model(String id, Map<String, Property> properties, List<String> requiredFields, List<String> optionalFields, List<String> subTypes,
 			String discriminator) {
-		super();
+		this();
 		this.id = id;
 		this.properties = properties;
 		this.requiredFields = requiredFields;
 		this.optionalFields = optionalFields;
 		this.subTypes = subTypes;
 		this.discriminator = discriminator;
+	}
+        
+        /**
+         * This creates a model
+         * @param id
+         * @param properties
+         * @param requiredFields
+         * @param optionalFields
+         * @param subTypes
+         * @param isModelSubtype Whether if this model is a subtype of another model
+         * @param discriminator 
+         */
+        public Model(String id, Map<String, Property> properties, List<String> requiredFields, List<String> optionalFields, List<String> subTypes, boolean isModelSubtype,
+			String discriminator) {
+		this(id, properties, requiredFields, optionalFields, subTypes, discriminator);
+                this.isModelSubtype = isModelSubtype;
 	}
 
 	/**
@@ -127,6 +146,14 @@ public class Model {
 	public void setSubTypes(List<String> subTypes) {
 		this.subTypes = subTypes;
 	}
+
+        public boolean isIsModelSubtype() {
+            return isModelSubtype;
+        }
+
+        public void setIsModelSubtype(boolean isModelSubtype) {
+            this.isModelSubtype = isModelSubtype;
+        }
 
 	/**
 	 * This gets the discriminator
