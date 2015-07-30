@@ -5,7 +5,7 @@
 	<groupId>com.carma</groupId>
 	<artifactId>swagger-doclet-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0.4.2</version>
+	<version>1.0.4.3-SNAPSHOT</version>
 	<name>Swagger Doclet</name>
 	<url>https://github.com/Carma-Public/swagger-jaxrs-doclet</url>
 	<description>
