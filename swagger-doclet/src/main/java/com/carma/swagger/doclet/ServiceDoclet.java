@@ -80,15 +80,18 @@ public class ServiceDoclet {
 		options.put("-operationNotesTags", 2);
 		options.put("-operationSummaryTags", 2);
 		options.put("-fieldDescriptionTags", 2);
+		options.put("-fieldFormatTags", 2);
 		options.put("-fieldMinTags", 2);
 		options.put("-fieldMaxTags", 2);
 		options.put("-fieldDefaultTags", 2);
 
 		options.put("-requiredParamsTags", 2);
 		options.put("-optionalParamsTags", 2);
+		options.put("-paramsFormatTags", 2);
 		options.put("-paramsMinValueTags", 2);
 		options.put("-paramsMaxValueTags", 2);
 		options.put("-paramsDefaultValueTags", 2);
+		options.put("-paramsAllowableValuesTags", 2);
 		options.put("-paramsNameTags", 2);
 		options.put("-parameterNameAnnotations", 2);
 
@@ -136,12 +139,14 @@ public class ServiceDoclet {
 		options.put("-modelFieldsRequiredByDefault", 1);
 		options.put("-modelFieldsNamingConvention", 2);
 		options.put("-disableModelFieldsXmlAccessType", 1);
+		options.put("-defaultModelFieldsXmlAccessType", 1);
 
 		// supports removing certain methods from the docs, e.g. for hidden/private
 		// endpoints
 		options.put("-typesToTreatAsOpaque", 2); // this is kept for backward compatibility
 		options.put("-excludeModelPrefixes", 2);
 		options.put("-excludeResourcePrefixes", 2);
+		options.put("-includeResourcePrefixes", 2);
 
 		options.put("-excludeParamAnnotations", 2);
 		options.put("-excludeClassTags", 2);

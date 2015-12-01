@@ -67,6 +67,12 @@ public class CollectionResource {
 	}
 
 	@POST
+	@Path("/listofints")
+	public void setListOfInts(List<Integer> items) {
+		// noop
+	}
+
+	@POST
 	@Path("/setofstrings")
 	public void setSetOfStrings(Set<String> items) {
 		// noop

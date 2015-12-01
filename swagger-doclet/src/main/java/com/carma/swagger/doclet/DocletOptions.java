@@ -85,7 +85,7 @@ public class DocletOptions {
 
 			} else if (option[0].equals("-extraApiDeclarations")) {
 				List<ApiDeclaration> extraApiDeclarations = new ArrayList<ApiDeclaration>();
-				String[] filePaths = option[1].split(";");
+				String[] filePaths = option[1].split(",");
 				for (String filePath : filePaths) {
 					filePath = filePath.trim();
 					ApiDeclaration api = loadModelFromJson("-apiAuthorizationsFile", filePath, ApiDeclaration.class);
@@ -139,6 +139,8 @@ public class DocletOptions {
 				parsedOptions.modelFieldsRequiredByDefault = true;
 			} else if (option[0].equals("-disableModelFieldsXmlAccessType")) {
 				parsedOptions.modelFieldsXmlAccessTypeEnabled = false;
+			} else if (option[0].equals("-defaultModelFieldsXmlAccessType")) {
+				parsedOptions.modelFieldsDefaultXmlAccessTypeEnabled = true;
 			} else if (option[0].equals("-modelFieldsNamingConvention")) {
 				parsedOptions.modelFieldsNamingConvention = NamingConvention.forValue(option[1], NamingConvention.DEFAULT_NAME);
 			} else if (option[0].equals("-disableCopySwaggerUi") || option[0].equals("-skipUiFiles")) {
@@ -159,12 +161,13 @@ public class DocletOptions {
 				parsedOptions.excludeDeprecatedResourceClasses = false;
 			} else if (option[0].equals("-disableDeprecatedModelClassExclusion")) {
 				parsedOptions.excludeDeprecatedModelClasses = false;
-			} else if (option[0].equals("-responseMessageTags")) {
-				parsedOptions.responseMessageTags.addAll(asList(copyOfRange(option, 1, option.length)));
+
 			} else if (option[0].equals("-excludeModelPrefixes") || option[0].equals("-typesToTreatAsOpaque")) {
 				parsedOptions.excludeModelPrefixes.addAll(asList(copyOfRange(option, 1, option.length)));
 			} else if (option[0].equals("-excludeResourcePrefixes")) {
 				parsedOptions.excludeResourcePrefixes.addAll(asList(copyOfRange(option, 1, option.length)));
+			} else if (option[0].equals("-includeResourcePrefixes")) {
+				parsedOptions.includeResourcePrefixes.addAll(asList(copyOfRange(option, 1, option.length)));
 			} else if (option[0].equals("-genericWrapperTypes")) {
 				parsedOptions.genericWrapperTypes.addAll(asList(copyOfRange(option, 1, option.length)));
 			} else if (option[0].equals("-fileParameterAnnotations")) {
@@ -190,54 +193,90 @@ public class DocletOptions {
 				parsedOptions.parameterNameAnnotations.addAll(asList(copyOfRange(option, 1, option.length)));
 			} else if (option[0].equals("-stringTypePrefixes")) {
 				parsedOptions.stringTypePrefixes.addAll(asList(copyOfRange(option, 1, option.length)));
+
+			} else if (option[0].equals("-responseMessageTags")) {
+				addTagsOption(parsedOptions.responseMessageTags, option);
+
 			} else if (option[0].equals("-excludeClassTags")) {
-				parsedOptions.excludeClassTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.excludeClassTags, option);
+
 			} else if (option[0].equals("-excludeOperationTags")) {
-				parsedOptions.excludeOperationTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.excludeOperationTags, option);
+
 			} else if (option[0].equals("-excludeFieldTags")) {
-				parsedOptions.excludeFieldTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.excludeFieldTags, option);
+
 			} else if (option[0].equals("-excludeParamsTags")) {
-				parsedOptions.excludeParamsTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.excludeParamsTags, option);
+
 			} else if (option[0].equals("-csvParamsTags")) {
-				parsedOptions.csvParamsTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.csvParamsTags, option);
+
+			} else if (option[0].equals("-paramsFormatTags")) {
+				addTagsOption(parsedOptions.paramsFormatTags, option);
+
 			} else if (option[0].equals("-paramsMinValueTags")) {
-				parsedOptions.paramsMinValueTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.paramsMinValueTags, option);
+
 			} else if (option[0].equals("-paramsMaxValueTags")) {
-				parsedOptions.paramsMaxValueTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.paramsMaxValueTags, option);
+
 			} else if (option[0].equals("-paramsDefaultValueTags")) {
-				parsedOptions.paramsDefaultValueTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.paramsDefaultValueTags, option);
+
+			} else if (option[0].equals("-paramsAllowableValuesTags")) {
+				addTagsOption(parsedOptions.paramsAllowableValuesTags, option);
+
 			} else if (option[0].equals("-paramsNameTags")) {
-				parsedOptions.paramsNameTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.paramsNameTags, option);
+
 			} else if (option[0].equals("-resourceTags")) {
-				parsedOptions.resourceTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.resourceTags, option);
+
 			} else if (option[0].equals("-responseTypeTags")) {
-				parsedOptions.responseTypeTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.responseTypeTags, option);
+
 			} else if (option[0].equals("-inputTypeTags")) {
-				parsedOptions.inputTypeTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.inputTypeTags, option);
+
 			} else if (option[0].equals("-defaultErrorTypeTags")) {
-				parsedOptions.defaultErrorTypeTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.defaultErrorTypeTags, option);
+
 			} else if (option[0].equals("-apiDescriptionTags")) {
-				parsedOptions.apiDescriptionTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.apiDescriptionTags, option);
+
 			} else if (option[0].equals("-operationNotesTags")) {
-				parsedOptions.operationNotesTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.operationNotesTags, option);
+
 			} else if (option[0].equals("-operationSummaryTags")) {
-				parsedOptions.operationSummaryTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.operationSummaryTags, option);
+
 			} else if (option[0].equals("-fieldDescriptionTags")) {
-				parsedOptions.fieldDescriptionTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.fieldDescriptionTags, option);
+
+			} else if (option[0].equals("-fieldFormatTags")) {
+				addTagsOption(parsedOptions.fieldFormatTags, option);
+
 			} else if (option[0].equals("-fieldMinTags")) {
-				parsedOptions.fieldMinTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.fieldMinTags, option);
+
 			} else if (option[0].equals("-fieldMaxTags")) {
-				parsedOptions.fieldMaxTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.fieldMaxTags, option);
+
 			} else if (option[0].equals("-fieldDefaultTags")) {
-				parsedOptions.fieldDefaultTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.fieldDefaultTags, option);
+
 			} else if (option[0].equals("-requiredParamsTags")) {
-				parsedOptions.requiredParamsTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.requiredParamsTags, option);
+
 			} else if (option[0].equals("-optionalParamsTags")) {
-				parsedOptions.optionalParamsTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.optionalParamsTags, option);
+
 			} else if (option[0].equals("-requiredFieldTags")) {
-				parsedOptions.requiredFieldTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.requiredFieldTags, option);
+
 			} else if (option[0].equals("-optionalFieldTags")) {
-				parsedOptions.optionalFieldTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.optionalFieldTags, option);
 
 				// JSR 303
 			} else if (option[0].equals("-paramMinValueAnnotations")) {
@@ -258,15 +297,20 @@ public class DocletOptions {
 				parsedOptions.optionalFieldAnnotations.addAll(asList(copyOfRange(option, 1, option.length)));
 
 			} else if (option[0].equals("-unauthOperationTags")) {
-				parsedOptions.unauthOperationTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.unauthOperationTags, option);
+
 			} else if (option[0].equals("-authOperationTags")) {
-				parsedOptions.authOperationTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.authOperationTags, option);
+
 			} else if (option[0].equals("-unauthOperationTagValues")) {
 				parsedOptions.unauthOperationTagValues.addAll(asList(copyOfRange(option, 1, option.length)));
+
 			} else if (option[0].equals("-authOperationScopes")) {
 				parsedOptions.authOperationScopes.addAll(asList(copyOfRange(option, 1, option.length)));
+
 			} else if (option[0].equals("-operationScopeTags")) {
-				parsedOptions.operationScopeTags.addAll(asList(copyOfRange(option, 1, option.length)));
+				addTagsOption(parsedOptions.operationScopeTags, option);
+
 			} else if (option[0].equals("-serializationFeatures")) {
 				serializationFeaturesCsv = option[1];
 			} else if (option[0].equals("-deserializationFeatures")) {
@@ -279,6 +323,16 @@ public class DocletOptions {
 		}
 		parsedOptions.recorder = new ObjectMapperRecorder(serializationFeaturesCsv, deserializationFeaturesCsv, defaultTyping, serializationInclusion);
 		return parsedOptions;
+	}
+
+	private static void addTagsOption(List<String> list, String[] option) {
+		List<String> tags = asList(copyOfRange(option, 1, option.length));
+		for (String tag : tags) {
+			if (tag.startsWith("@")) {
+				tag = tag.substring(1);
+			}
+			list.add(tag);
+		}
 	}
 
 	private File outputDirectory;
@@ -294,6 +348,7 @@ public class DocletOptions {
 	private Properties variableReplacements;
 
 	private List<String> excludeResourcePrefixes;
+	private List<String> includeResourcePrefixes;
 	private List<String> excludeModelPrefixes;
 	private List<String> genericWrapperTypes;
 	private List<String> responseMessageTags;
@@ -313,11 +368,13 @@ public class DocletOptions {
 	private List<String> excludeFieldTags;
 	private List<String> excludeParamsTags;
 	private List<String> csvParamsTags;
+	private List<String> paramsFormatTags;
 	private List<String> paramsMinValueTags;
 	private List<String> paramMinValueAnnotations;
 	private List<String> paramsMaxValueTags;
 	private List<String> paramMaxValueAnnotations;
 	private List<String> paramsDefaultValueTags;
+	private List<String> paramsAllowableValuesTags;
 	private List<String> paramsNameTags;
 	private List<String> resourceTags;
 	private List<String> apiDescriptionTags;
@@ -325,6 +382,7 @@ public class DocletOptions {
 	private List<String> operationSummaryTags;
 	private List<String> fieldDescriptionTags;
 
+	private List<String> fieldFormatTags;
 	private List<String> fieldMinTags;
 	private List<String> fieldMinAnnotations;
 	private List<String> fieldMaxTags;
@@ -371,6 +429,7 @@ public class DocletOptions {
 	private boolean parseModels = true;
 	private boolean modelFieldsRequiredByDefault = false;
 	private boolean modelFieldsXmlAccessTypeEnabled = true;
+	private boolean modelFieldsDefaultXmlAccessTypeEnabled = false;
 	private NamingConvention modelFieldsNamingConvention = NamingConvention.DEFAULT_NAME;
 
 	private boolean sortResourcesByPath = false;
@@ -394,6 +453,8 @@ public class DocletOptions {
 	public DocletOptions() {
 		this.excludeParamAnnotations = new ArrayList<String>();
 		this.excludeParamAnnotations.add("javax.ws.rs.core.Context");
+		this.excludeParamAnnotations.add("javax.ws.rs.CookieParam");
+		this.excludeParamAnnotations.add("javax.ws.rs.MatrixParam");
 
 		this.responseMessageTags = new ArrayList<String>();
 		this.responseMessageTags.add("responseMessage");
@@ -465,6 +526,7 @@ public class DocletOptions {
 		this.subTypesAnnotations.add("com.fasterxml.jackson.annotation.JsonSubTypes");
 
 		this.excludeResourcePrefixes = new ArrayList<String>();
+		this.includeResourcePrefixes = new ArrayList<String>();
 
 		this.excludeClassTags = new ArrayList<String>();
 		this.excludeClassTags.add("hidden");
@@ -489,6 +551,10 @@ public class DocletOptions {
 		this.csvParamsTags = new ArrayList<String>();
 		this.csvParamsTags.add("csvParams");
 
+		this.paramsFormatTags = new ArrayList<String>();
+		this.paramsFormatTags.add("paramsFormat");
+		this.paramsFormatTags.add("formats");
+
 		this.paramsMinValueTags = new ArrayList<String>();
 		this.paramsMinValueTags.add("paramsMinValue");
 		this.paramsMinValueTags.add("paramsMinimumValue");
@@ -502,6 +568,10 @@ public class DocletOptions {
 		this.paramsDefaultValueTags = new ArrayList<String>();
 		this.paramsDefaultValueTags.add("paramsDefaultValue");
 		this.paramsDefaultValueTags.add("defaultValues");
+
+		this.paramsAllowableValuesTags = new ArrayList<String>();
+		this.paramsAllowableValuesTags.add("paramsAllowableValues");
+		this.paramsAllowableValuesTags.add("allowableValues");
 
 		this.resourceTags = new ArrayList<String>();
 		this.resourceTags.add("parentEndpointName");
@@ -536,6 +606,9 @@ public class DocletOptions {
 		this.fieldDescriptionTags.add("description");
 		this.fieldDescriptionTags.add("comment");
 		this.fieldDescriptionTags.add("return");
+
+		this.fieldFormatTags = new ArrayList<String>();
+		this.fieldFormatTags.add("format");
 
 		this.fieldMinTags = new ArrayList<String>();
 		this.fieldMinTags.add("min");
@@ -776,6 +849,14 @@ public class DocletOptions {
 	}
 
 	/**
+	 * This gets the paramsFormatTags
+	 * @return the paramsFormatTags
+	 */
+	public List<String> getParamsFormatTags() {
+		return this.paramsFormatTags;
+	}
+
+	/**
 	 * This gets the paramsMinValueTags
 	 * @return the paramsMinValueTags
 	 */
@@ -797,6 +878,14 @@ public class DocletOptions {
 	 */
 	public List<String> getParamsDefaultValueTags() {
 		return this.paramsDefaultValueTags;
+	}
+
+	/**
+	 * This gets the paramsAllowableValuesTags
+	 * @return the paramsAllowableValuesTags
+	 */
+	public List<String> getParamsAllowableValuesTags() {
+		return this.paramsAllowableValuesTags;
 	}
 
 	/**
@@ -830,6 +919,23 @@ public class DocletOptions {
 	 */
 	public DocletOptions setExcludeResourcePrefixes(List<String> excludeResourcePrefixes) {
 		this.excludeResourcePrefixes = excludeResourcePrefixes;
+		return this;
+	}
+
+	/**
+	 * This gets prefixes of the FQN of resource classes to include, if specified then resources must match these
+	 * @return the prefixes of the FQN of resource classes to include, if specified then resources must match these
+	 */
+	public List<String> getIncludeResourcePrefixes() {
+		return this.includeResourcePrefixes;
+	}
+
+	/**
+	 * This sets the prefixes of the FQN of resource classes to include, if specified then resources must match these
+	 * @param includeResourcePrefixes the prefixes of the FQN of resource classes to include, if specified then resources must match these
+	 */
+	public DocletOptions setIncludeResourcePrefixes(List<String> includeResourcePrefixes) {
+		this.includeResourcePrefixes = includeResourcePrefixes;
 		return this;
 	}
 
@@ -985,6 +1091,23 @@ public class DocletOptions {
 	}
 
 	/**
+	 * This gets the modelFieldsDefaultXmlAccessTypeEnabled
+	 * @return the modelFieldsDefaultXmlAccessTypeEnabled
+	 */
+	public boolean isModelFieldsDefaultXmlAccessTypeEnabled() {
+		return this.modelFieldsDefaultXmlAccessTypeEnabled;
+	}
+
+	/**
+	 * This sets the modelFieldsDefaultXmlAccessTypeEnabled
+	 * @param modelFieldsDefaultXmlAccessTypeEnabled the modelFieldsDefaultXmlAccessTypeEnabled to set
+	 */
+	public DocletOptions setModelFieldsDefaultXmlAccessTypeEnabled(boolean modelFieldsDefaultXmlAccessTypeEnabled) {
+		this.modelFieldsDefaultXmlAccessTypeEnabled = modelFieldsDefaultXmlAccessTypeEnabled;
+		return this;
+	}
+
+	/**
 	 * This gets the modelFieldsNamingConvention
 	 * @return the modelFieldsNamingConvention
 	 */
@@ -1072,6 +1195,14 @@ public class DocletOptions {
 	 */
 	public List<String> getResourceDescriptionTags() {
 		return this.resourceDescriptionTags;
+	}
+
+	/**
+	 * This gets the fieldFormatTags
+	 * @return the fieldFormatTags
+	 */
+	public List<String> getFieldFormatTags() {
+		return this.fieldFormatTags;
 	}
 
 	/**

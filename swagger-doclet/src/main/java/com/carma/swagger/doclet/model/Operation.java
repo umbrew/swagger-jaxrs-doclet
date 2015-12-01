@@ -9,6 +9,7 @@ public class Operation {
 	private HttpMethod method;
 	private String nickname;
 	private String type; // void, primitive, complex or a container
+	private String format; // format for primitives
 	private PropertyItems items;
 
 	private List<ApiParameter> parameters;
@@ -32,8 +33,9 @@ public class Operation {
 		this.method = method.getMethod();
 		this.nickname = emptyToNull(method.getMethodName());
 		this.type = emptyToNull(method.getReturnType());
+		this.format = emptyToNull(method.getReturnTypeFormat());
 		if (method.getReturnTypeItemsRef() != null || method.getReturnTypeItemsType() != null) {
-			this.items = new PropertyItems(method.getReturnTypeItemsRef(), method.getReturnTypeItemsType(), method.getReturnTypeItemsAllowableValues());
+			this.items = new PropertyItems(method.getReturnTypeItemsRef(), method.getReturnTypeItemsType(), method.getReturnTypeItemsFormat());
 		}
 		this.parameters = method.getParameters().isEmpty() ? null : method.getParameters();
 		this.responseMessages = method.getResponseMessages().isEmpty() ? null : method.getResponseMessages();
@@ -59,6 +61,14 @@ public class Operation {
 
 	public String getType() {
 		return this.type;
+	}
+
+	/**
+	 * This gets the format
+	 * @return the format
+	 */
+	public String getFormat() {
+		return this.format;
 	}
 
 	/**
@@ -128,6 +138,7 @@ public class Operation {
 		result = prime * result + ((this.authorizations == null) ? 0 : this.authorizations.hashCode());
 		result = prime * result + ((this.consumes == null) ? 0 : this.consumes.hashCode());
 		result = prime * result + ((this.deprecated == null) ? 0 : this.deprecated.hashCode());
+		result = prime * result + ((this.format == null) ? 0 : this.format.hashCode());
 		result = prime * result + ((this.items == null) ? 0 : this.items.hashCode());
 		result = prime * result + ((this.method == null) ? 0 : this.method.hashCode());
 		result = prime * result + ((this.nickname == null) ? 0 : this.nickname.hashCode());
@@ -175,6 +186,13 @@ public class Operation {
 				return false;
 			}
 		} else if (!this.deprecated.equals(other.deprecated)) {
+			return false;
+		}
+		if (this.format == null) {
+			if (other.format != null) {
+				return false;
+			}
+		} else if (!this.format.equals(other.format)) {
 			return false;
 		}
 		if (this.items == null) {
@@ -245,9 +263,10 @@ public class Operation {
 	 */
 	@Override
 	public String toString() {
-		return "Operation [method=" + this.method + ", nickname=" + this.nickname + ", type=" + this.type + ", items=" + this.items + ", parameters="
-				+ this.parameters + ", summary=" + this.summary + ", notes=" + this.notes + ", responseMessages=" + this.responseMessages + ", consumes="
-				+ this.consumes + ", produces=" + this.produces + ", authorizations=" + this.authorizations + ", deprecated=" + this.deprecated + "]";
+		return "Operation [method=" + this.method + ", nickname=" + this.nickname + ", type=" + this.type + ", format=" + this.format + ", items=" + this.items
+				+ ", parameters=" + this.parameters + ", summary=" + this.summary + ", notes=" + this.notes + ", responseMessages=" + this.responseMessages
+				+ ", consumes=" + this.consumes + ", produces=" + this.produces + ", authorizations=" + this.authorizations + ", deprecated=" + this.deprecated
+				+ "]";
 	}
 
 }

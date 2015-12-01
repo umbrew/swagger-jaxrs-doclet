@@ -29,6 +29,16 @@ public class Data {
 	private int minMaxGetterTag;
 
 	/**
+	 * @defaultValue true
+	 */
+	boolean trueFieldTag;
+
+	/**
+	 * @defaultValue false
+	 */
+	boolean falseFieldTag;
+
+	/**
 	 * This creates a Input
 	 */
 	public Data() {

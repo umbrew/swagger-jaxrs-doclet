@@ -43,7 +43,6 @@
                         {
                             "paramType": "query",
                             "name": "p1",
-                            "type": "string",
                             "type": "integer",
                 			"format" : "int32",
                 			"minimum": 5,
@@ -83,12 +82,101 @@
                     ]
                 }
             ]
+        },
+        {
+            "path": "/valueconstraints/3",
+            "operations": [
+                {
+                    "method": "PUT",
+                    "nickname": "putBoolean",
+                    "type": "void",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "p1",
+                            "type": "boolean",
+                			"defaultValue" : true
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "p2",
+                            "type": "boolean",
+                			"defaultValue" : false
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "p3",
+                            "type": "boolean",
+                			"defaultValue" : true
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "p4",
+                            "type": "boolean",
+                			"defaultValue" : false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/valueconstraints/4",
+            "operations": [
+                {
+                    "method": "PUT",
+                    "nickname": "putEnum",
+                    "type": "void",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "p1",
+                            "type": "string",
+                			"defaultValue" : "C",
+                			"enum": [
+						        "A",
+						        "C"
+						    ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "p2",
+                            "type": "string",
+                			"enum": [
+						        "B"
+						    ]
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "models": {
         "Data": {
             "id": "Data",
             "properties": {
+            	"value": {
+                    "type": "string",
+                    "enum": [
+						        "VALUE1",
+						        "VALUE2"
+						    ]
+                },
+                "minFieldTag": {
+                	"type": "integer",
+                	"format" : "int32",
+                	"minimum": 1
+                },
+                "maxFieldTag": {
+                	"type": "integer",
+                	"format" : "int32",
+                	"maximum": 10
+                },
+                "minMaxFieldTag": {
+                	"type": "integer",
+                	"format" : "int32",
+                	"minimum": 2,
+                	"maximum": 8
+                },
                 "minGetterTag": {
                 	"type": "integer",
                 	"format" : "int32",
@@ -101,19 +189,6 @@
                 	"maximum": 10,
                 	"defaultValue" : 5
                 },
-                "value": {
-                    "type": "string",
-                    "enum": [
-						        "VALUE1",
-						        "VALUE2"
-						    ]
-                },
-                "minMaxFieldTag": {
-                	"type": "integer",
-                	"format" : "int32",
-                	"minimum": 2,
-                	"maximum": 8
-                },
                 "minMaxGetterTag": {
                 	"type": "integer",
                 	"format" : "int32",
@@ -121,15 +196,13 @@
                 	"maximum": 8,
                 	"defaultValue" : 2
                 },
-                "maxFieldTag": {
-                	"type": "integer",
-                	"format" : "int32",
-                	"maximum": 10
+                "trueFieldTag" : {
+                    "type": "boolean",
+                    "defaultValue" : true
                 },
-                "minFieldTag": {
-                	"type": "integer",
-                	"format" : "int32",
-                	"minimum": 1
+                "falseFieldTag" : {
+                    "type": "boolean",
+                    "defaultValue" : false
                 }
             }
         }

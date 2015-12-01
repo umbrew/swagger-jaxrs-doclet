@@ -10,7 +10,8 @@
                 {
                     "method": "GET",
                     "nickname": "get",
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int32"
                 },
                 {
                     "method": "POST",

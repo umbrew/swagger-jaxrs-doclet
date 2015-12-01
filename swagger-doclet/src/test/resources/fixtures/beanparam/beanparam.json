@@ -14,8 +14,9 @@
                     "parameters": [
                     	{
                             "paramType": "query",
-                            "name": "p3",
-                            "type": "string"
+                            "name": "p1",
+                            "type": "string",
+                            "required": true
                         },
                         {
                             "paramType": "query",
@@ -25,9 +26,8 @@
                         },
                         {
                             "paramType": "query",
-                            "name": "p1",
-                            "type": "string",
-                            "required": true
+                            "name": "p3",
+                            "type": "string"
                         }
                     ],
                     "produces": [
@@ -46,10 +46,9 @@
                     "type": "string",
                     "parameters": [
                     	{
-                            "paramType": "query",
-                            "name": "p3",
-                            "type": "string",
-                            "required": true
+                            "paramType": "form",
+                            "name": "p1",
+                            "type": "string"
                         },
                         {
                             "paramType": "path",
@@ -58,9 +57,10 @@
                             "format" : "int32"
                         },
                         {
-                            "paramType": "form",
-                            "name": "p1",
-                            "type": "string"
+                            "paramType": "query",
+                            "name": "p3",
+                            "type": "string",
+                            "required": true
                         }
                     ],
                     "produces": [

@@ -28,7 +28,7 @@
               </docletArtifact>
               <reportOutputDirectory>${project.build.outputDirectory}</reportOutputDirectory>
               <useStandardDocletOptions>false</useStandardDocletOptions>
-              <additionalparam>-apiVersion 1 -docBasePath /apidocs -apiBasePath / -swaggerUiPath ../../../src/main/resources/swagger-ui-2.0.24</additionalparam>
+              <additionalparam>-apiVersion 1 -docBasePath /apidocs -apiBasePath / -swaggerUiPath ../../../src/main/resources/swagger-ui-2.1.8-M1</additionalparam>
             </configuration>
           </execution>
         </executions>
@@ -64,7 +64,7 @@
               </excludes>
             </filter>
           </filters>
-          <minimizeJar>true</minimizeJar>
+          <minimizeJar>false</minimizeJar>
         </configuration>
       </plugin>
     </plugins>

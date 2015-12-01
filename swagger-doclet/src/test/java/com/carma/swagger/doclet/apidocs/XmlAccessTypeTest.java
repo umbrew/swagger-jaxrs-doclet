@@ -32,7 +32,7 @@ public class XmlAccessTypeTest {
 	@Before
 	public void setup() {
 		this.recorderMock = mock(Recorder.class);
-		this.options = new DocletOptions().setRecorder(this.recorderMock).setIncludeSwaggerUi(false);
+		this.options = new DocletOptions().setRecorder(this.recorderMock).setIncludeSwaggerUi(false).setModelFieldsDefaultXmlAccessTypeEnabled(true);
 	}
 
 	@Test

@@ -44,4 +44,24 @@ public class ValueContraintsResource {
 	public void putMinMaxes(@QueryParam("p1") double p1, @DefaultValue("12") @QueryParam("p2a") long p2) {
 		// noop
 	}
+
+	/**
+	 * @paramsDefaultValue p1 tRue p2 FALSE
+	 */
+	@PUT
+	@Path("/3")
+	public void putBoolean(@QueryParam("p1") boolean p1, @QueryParam("p2") boolean p2, @DefaultValue("True") @QueryParam("p3") boolean p3,
+			@DefaultValue("False") @QueryParam("p4") boolean p4) {
+		// noop
+	}
+
+	/**
+	 * @paramsAllowableValues p1 A p2 B p1 C
+	 * @paramsDefaultValue p1 C
+	 */
+	@PUT
+	@Path("/4")
+	public void putEnum(@QueryParam("p1") String p1, @QueryParam("p2") String p2) {
+		// noop
+	}
 }

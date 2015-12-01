@@ -54,6 +54,60 @@ public class ResponseModelResource {
 	}
 
 	/**
+	 * @responseType string
+	 */
+	@SuppressWarnings("javadoc")
+	@GET
+	public Response responseString() {
+		return Response.ok().build();
+	}
+
+	/**
+	 * @responseType java.lang.String
+	 */
+	@SuppressWarnings("javadoc")
+	@GET
+	public Response responseStringObject() {
+		return Response.ok().build();
+	}
+
+	/**
+	 * @responseType int
+	 */
+	@SuppressWarnings("javadoc")
+	@GET
+	public Response responseInt() {
+		return Response.ok().build();
+	}
+
+	/**
+	 * @responseType java.lang.Integer
+	 */
+	@SuppressWarnings("javadoc")
+	@GET
+	public Response responseIntObject() {
+		return Response.ok().build();
+	}
+
+	/**
+	 * @responseType java.math.BigInteger
+	 */
+	@SuppressWarnings("javadoc")
+	@GET
+	public Response responseBigIntObject() {
+		return Response.ok().build();
+	}
+
+	/**
+	 * @responseType java.math.BigDecimal
+	 */
+	@SuppressWarnings("javadoc")
+	@GET
+	public Response responseBigDecObject() {
+		return Response.ok().build();
+	}
+
+	/**
 	 * @responseMessage 200 if ok `fixtures.responsemodel.Response1
 	 * @responseMessage 404 if no result found `fixtures.responsemodel.Response2
 	 * @responseMessage 500 if an internal error occurred

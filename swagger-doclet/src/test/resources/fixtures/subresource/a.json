@@ -11,6 +11,7 @@
                     "method": "POST",
                     "nickname": "y",
                     "type": "integer",
+                    "format" : "int32",
                     "parameters": [
 
                         {
@@ -68,6 +69,7 @@
                     "method": "POST",
                     "nickname": "y",
                     "type": "integer",
+                    "format" : "int32",
                     "parameters": [
 
                         {

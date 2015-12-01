@@ -1,6 +1,7 @@
 package com.carma.swagger.doclet.parser;
 
 import static com.carma.swagger.doclet.parser.ParserHelper.parsePath;
+import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Objects.firstNonNull;
 import static com.google.common.collect.Maps.uniqueIndex;
 
@@ -213,9 +214,16 @@ public class CrossClassApiParser {
 				}
 			}
 		}
-		if (resourcePath != null && !resourcePath.startsWith("/")) {
-			resourcePath = "/" + resourcePath;
+
+		// sanitize the path and ensure it starts with /
+		if (resourcePath != null) {
+			resourcePath = ParserHelper.sanitizePath(resourcePath);
+
+			if (!resourcePath.startsWith("/")) {
+				resourcePath = "/" + resourcePath;
+			}
 		}
+
 		return resourcePath;
 	}
 
@@ -237,7 +245,7 @@ public class CrossClassApiParser {
 
 	private void setApiPriority(String classResourcePriority, MethodDoc method, ClassDoc currentClassDoc, ApiDeclaration declaration) {
 		int priorityVal = Integer.MAX_VALUE;
-		String priority = ParserHelper.getTagValue(method, this.options.getResourcePriorityTags(), this.options);
+		String priority = ParserHelper.getInheritableTagValue(method, this.options.getResourcePriorityTags(), this.options);
 		if (priority != null) {
 			priorityVal = Integer.parseInt(priority);
 		} else if (classResourcePriority != null) {
@@ -251,7 +259,7 @@ public class CrossClassApiParser {
 	}
 
 	private void setApiDeclarationDescription(String classResourceDescription, MethodDoc method, ApiDeclaration declaration) {
-		String description = ParserHelper.getTagValue(method, this.options.getResourceDescriptionTags(), this.options);
+		String description = ParserHelper.getInheritableTagValue(method, this.options.getResourceDescriptionTags(), this.options);
 		if (description == null) {
 			description = classResourceDescription;
 		}
@@ -270,7 +278,7 @@ public class CrossClassApiParser {
 		}
 
 		// read api level description
-		String apiDescription = ParserHelper.getTagValue(method, this.options.getApiDescriptionTags(), this.options);
+		String apiDescription = ParserHelper.getInheritableTagValue(method, this.options.getApiDescriptionTags(), this.options);
 
 		if (methodApi == null) {
 			methodApi = new Api(parsedMethod.getPath(), this.options.replaceVars(apiDescription), new ArrayList<Operation>());
@@ -279,7 +287,20 @@ public class CrossClassApiParser {
 			methodApi.setDescription(apiDescription);
 		}
 
-		methodApi.getOperations().add(new Operation(parsedMethod));
+		boolean alreadyAdded = false;
+		// skip already added declarations
+		for (Operation operation : methodApi.getOperations()) {
+			boolean opParamsEmptyOrNull = operation.getParameters() == null || operation.getParameters().isEmpty();
+			boolean parsedParamsEmptyOrNull = parsedMethod.getParameters() == null || parsedMethod.getParameters().isEmpty();
+			if (operation.getMethod().equals(parsedMethod.getMethod())
+					&& ((parsedParamsEmptyOrNull && opParamsEmptyOrNull) || (!opParamsEmptyOrNull && !parsedParamsEmptyOrNull && operation.getParameters()
+							.size() == parsedMethod.getParameters().size())) && equal(operation.getNickname(), parsedMethod.getMethodName())) {
+				alreadyAdded = true;
+			}
+		}
+		if (!alreadyAdded) {
+			methodApi.getOperations().add(new Operation(parsedMethod));
+		}
 	}
 
 }

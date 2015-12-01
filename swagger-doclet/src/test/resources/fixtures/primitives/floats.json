@@ -10,7 +10,8 @@
                 {
                     "method": "GET",
                     "nickname": "get",
-                    "type": "number"
+                    "type": "number",
+                    "format": "float"
                 },
                 {
                     "method": "POST",

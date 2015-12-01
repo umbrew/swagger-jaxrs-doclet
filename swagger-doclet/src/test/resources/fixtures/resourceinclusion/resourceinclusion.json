@@ -1,0 +1,9 @@
+{
+    "apiVersion": "0",
+    "swaggerVersion": "1.2",
+    "apis": [
+     	{
+            "path": "/r2.{format}"
+        }
+    ]
+}

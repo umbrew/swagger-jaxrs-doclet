@@ -1,5 +1,8 @@
 language: java
-script: mvn deploy --settings maven_deploy_settings.xml
+script:
+  -  mvn clean test
+after_success:
+  -  test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && mvn deploy -DskipTests=true --settings maven_deploy_settings.xml
 jdk:
 - oraclejdk7
 env:

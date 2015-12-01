@@ -1,0 +1,28 @@
+{
+    "apiVersion": "0",
+    "swaggerVersion": "1.2",
+    "basePath": "http://localhost:8080",
+    "resourcePath": "/idwrapper",
+    "apis": [
+        {
+            "path": "/idwrapper",
+            "operations": [
+                {
+                    "method": "GET",
+                    "nickname": "get",
+                    "type": "MyObject"
+                }
+            ]
+        }
+    ],
+    "models": {
+        "MyObject": {
+            "id": "MyObject",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

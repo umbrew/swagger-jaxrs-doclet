@@ -1,5 +1,7 @@
 package com.carma.swagger.doclet.sample;
 
+import org.eclipse.jetty.servlets.CrossOriginFilter;
+
 import com.carma.swagger.doclet.sample.resources.AuthResource;
 import com.carma.swagger.doclet.sample.resources.FileResource;
 import com.carma.swagger.doclet.sample.resources.GreetingsResource;
@@ -8,6 +10,7 @@ import com.carma.swagger.doclet.sample.resources.ModelResource;
 import com.carma.swagger.doclet.sample.resources.ParentResource;
 import com.carma.swagger.doclet.sample.resources.PersonResource;
 import com.carma.swagger.doclet.sample.resources.RecursiveResource;
+import com.carma.swagger.doclet.sample.resources.RegexPathResource;
 import com.carma.swagger.doclet.sample.resources.ResponseResource;
 import com.carma.swagger.doclet.sample.resources.SubResource;
 import com.google.common.base.Optional;
@@ -41,6 +44,10 @@ public class SampleService extends Service<Configuration> {
 			}
 		}, "AuthResource Realm"));
 
+		environment.addFilter(CrossOriginFilter.class, "/*").setInitParam("allowedOrigins", "*")
+				.setInitParam("allowedHeaders", "X-Requested-With,Content-Type,Accept,Origin")
+				.setInitParam("allowedMethods", "OPTIONS,GET,PUT,POST,DELETE,HEAD");
+
 		environment.addResource(new AuthResource());
 		environment.addResource(new GreetingsResource());
 		environment.addResource(new HttpServletRequestResource());
@@ -51,5 +58,6 @@ public class SampleService extends Service<Configuration> {
 		environment.addResource(new SubResource());
 		environment.addResource(new PersonResource());
 		environment.addResource(new FileResource());
+		environment.addResource(new RegexPathResource());
 	}
 }

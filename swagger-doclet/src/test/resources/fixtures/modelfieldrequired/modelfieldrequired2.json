@@ -47,7 +47,7 @@
                     "type": "string"
                 }
             },
-            "required" : ["requiredMethodTag", "defaultMethodTag", "defaultField", "requiredGetterTag", "defaultGetterTag", "requiredField"]
+            "required" : ["defaultField", "requiredField", "defaultGetterTag", "requiredGetterTag", "requiredMethodTag", "defaultMethodTag"]
         }
     }
 }
