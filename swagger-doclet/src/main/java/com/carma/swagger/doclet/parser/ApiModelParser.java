@@ -39,7 +39,7 @@ public class ApiModelParser {
 	private final Type rootType;
 	private final Set<Model> models;
 	private final ClassDoc[] viewClasses;
-	private final boolean inheritFields;
+	private final boolean isModelSubtype;
 
 	private Map<String, Type> varsToTypes = new HashMap<String, Type>();
 
@@ -64,10 +64,10 @@ public class ApiModelParser {
 	 * @param options
 	 * @param translator
 	 * @param rootType
-	 * @param inheritFields whether to inherit fields from super types
+	 * @param isModelSubtype Whether the model is a subtype of another model, i.e. whether to inherit fields from supertypes
 	 */
-	public ApiModelParser(DocletOptions options, Translator translator, Type rootType, boolean inheritFields) {
-		this(options, translator, rootType, null, inheritFields);
+	public ApiModelParser(DocletOptions options, Translator translator, Type rootType, boolean isModelSubtype) {
+		this(options, translator, rootType, null, isModelSubtype);
 	}
 
 	/**
@@ -87,9 +87,9 @@ public class ApiModelParser {
 	 * @param translator
 	 * @param rootType
 	 * @param viewClasses
-	 * @param inheritFields whether to inherit fields from super types
+	 * @param isModelSubtype Whether the model is a subtype of another model, i.e. whether to inherit fields from supertypes
 	 */
-	public ApiModelParser(DocletOptions options, Translator translator, Type rootType, ClassDoc[] viewClasses, boolean inheritFields) {
+	public ApiModelParser(DocletOptions options, Translator translator, Type rootType, ClassDoc[] viewClasses, boolean isModelSubtype) {
 		this.options = options;
 		this.translator = translator;
 		this.rootType = rootType;
@@ -111,14 +111,14 @@ public class ApiModelParser {
                 if (annSubTypes != null) {
                     for (ClassDoc subType : annSubTypes) {
                         if (this.translator.typeName(rootType.asClassDoc()).value().equals(this.translator.typeName(subType).value())) {
-                            inheritFields = false;
+                            isModelSubtype = false;
                         }
                     }
                 }
             }
         }
         
-        this.inheritFields = inheritFields;
+        this.isModelSubtype = isModelSubtype;
 	}
 
 	/**
@@ -127,10 +127,10 @@ public class ApiModelParser {
 	 * @param translator
 	 * @param rootType
 	 * @param consumesMultipart
-	 * @param inheritFields whether to inherit fields from super types
+	 * @param isModelSubtype Whether the model is a subtype of another model, i.e. whether to inherit fields from supertypes
 	 */
-	public ApiModelParser(DocletOptions options, Translator translator, Type rootType, boolean consumesMultipart, boolean inheritFields) {
-		this(options, translator, rootType, null, inheritFields);
+	public ApiModelParser(DocletOptions options, Translator translator, Type rootType, boolean consumesMultipart, boolean isModelSubtype) {
+		this(options, translator, rootType, null, isModelSubtype);
 		this.consumesMultipart = consumesMultipart;
 		this.composite = true;
 	}
@@ -158,8 +158,8 @@ public class ApiModelParser {
 		// process sub types
 		for (ClassDoc subType : this.subTypeClasses) {
 			ApiModelParser subTypeParser = new ApiModelParser(this.options, this.translator, subType, false);
-			Set<Model> subTypeModesl = subTypeParser.parse();
-			this.models.addAll(subTypeModesl);
+			Set<Model> subTypeModels = subTypeParser.parse();
+			this.models.addAll(subTypeModels);
 		}
 
 		return this.models;
@@ -288,7 +288,7 @@ public class ApiModelParser {
 				}
 			}
 
-			this.models.add(new Model(modelId, elements, requiredFields, optionalFields, subTypes, discriminator));
+			this.models.add(new Model(modelId, elements, requiredFields, optionalFields, subTypes, !this.isModelSubtype, discriminator));
 			parseNestedModels(types.values());
 		}
 	}
@@ -336,7 +336,7 @@ public class ApiModelParser {
 	// grandparents down, this allows us to override field names via the lower levels
 	List<ClassDoc> getClassLineage(ClassDoc classDoc) {
 		List<ClassDoc> classes = new ArrayList<ClassDoc>();
-		if (!this.inheritFields) {
+		if (!this.isModelSubtype) {
 			classes.add(classDoc);
 			return classes;
 		}
@@ -822,7 +822,7 @@ public class ApiModelParser {
 			}
 			String containerTypeOf = containerOf == null ? null : this.translator.typeName(containerOf).value();
 			if (containerOf != null) {
-                itemsAllowableValues = ParserHelper.getAllowableValues(containerOf.asClassDoc());
+                List<String> itemsAllowableValues = ParserHelper.getAllowableValues(containerOf.asClassDoc());
                 if (itemsAllowableValues != null) {
                     itemsType = "string";
                 } else {

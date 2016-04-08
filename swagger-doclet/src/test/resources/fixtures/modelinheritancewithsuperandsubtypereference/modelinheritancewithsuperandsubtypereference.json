@@ -1,0 +1,56 @@
+{
+    "apiVersion": "0",
+    "swaggerVersion": "1.2",
+    "basePath": "http://localhost:8080",
+    "resourcePath": "/modelinheritancewithsuperandsubtypereference",
+    "apis": [
+        {
+            "path": "/modelinheritancewithsuperandsubtypereference",
+            "operations": [
+                {
+                    "method": "GET",
+                    "nickname": "getBikeShop",
+                    "type": "BikeShop"
+                }
+            ]
+        }
+    ],
+    "models": {
+        "BikeShop": {
+            "id": "BikeShop",
+            "properties": {
+                "inventory": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "Motorcycle"
+                    }
+                },
+                "companyVehicle": {
+                    "type": "Vehicle"
+                }
+            }
+        },
+        "Motorcycle": {
+            "id": "Motorcycle",
+            "properties": {
+            }
+        },
+        "Vehicle": {
+            "id": "Vehicle",
+            "properties": {
+                "make": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required" : [ "type" ],
+            "subTypes" : [ "Motorcycle" ],
+            "discriminator" : "type"
+        }
+    }
+}
