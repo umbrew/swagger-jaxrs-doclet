@@ -30,6 +30,7 @@
                     "method": "POST",
                     "nickname": "createSpeech",
                     "type": "integer",
+                    "format" : "int32",
                     "parameters": [
                         {
                             "paramType": "body",
@@ -48,6 +49,7 @@
                     "method": "POST",
                     "nickname": "createSpeechWithAnnotatedPayload",
                     "type": "integer",
+                    "format" : "int32",
                     "parameters": [
                         {
                             "paramType": "body",
@@ -66,6 +68,7 @@
                     "method": "POST",
                     "nickname": "createSub",
                     "type": "integer",
+                    "format" : "int32",
                     "parameters": [
 
                         {

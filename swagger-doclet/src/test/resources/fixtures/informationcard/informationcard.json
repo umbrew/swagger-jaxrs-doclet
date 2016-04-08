@@ -40,6 +40,17 @@
       }
    ],
    "models":{
+      "informationCardCollection":{
+         "id":"informationCardCollection",
+         "properties":{
+            "cards":{
+               "type":"array",
+               "items":{
+                  "$ref":"informationCard"
+               }
+            }
+         }
+      },
       "informationCard":{
          "id":"informationCard",
          "properties":{
@@ -61,17 +72,6 @@
             },
             "type":{
                "type":"string"
-            }
-         }
-      },
-      "informationCardCollection":{
-         "id":"informationCardCollection",
-         "properties":{
-            "cards":{
-               "type":"array",
-               "items":{
-                  "$ref":"informationCard"
-               }
             }
          }
       }

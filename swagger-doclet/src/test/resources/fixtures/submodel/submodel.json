@@ -1,0 +1,62 @@
+{
+    "apiVersion": "0",
+    "swaggerVersion": "1.2",
+    "basePath": "http://localhost:8080",
+    "resourcePath": "/submodel",
+    "apis": [
+        {
+            "path": "/submodel/bar",
+            "operations": [
+                {
+                    "method": "GET",
+                    "nickname": "getBar",
+                    "type": "Bar"
+                }
+            ]
+        },
+        {
+            "path": "/submodel/foo",
+            "operations": [
+                {
+                    "method": "GET",
+                    "nickname": "getFoo",
+                    "type": "Foo"
+                }
+            ]
+        }
+    ],
+    "models": {
+        "Foo": {
+            "id": "Foo",
+            "properties": {
+                "baz": {
+                    "type": "Foo-Baz"
+                }
+            }
+        },
+        "Bar": {
+            "id": "Bar",
+            "properties": {
+                "baz": {
+                    "type": "Bar-Baz"
+                }
+            }
+        },
+        "Foo-Baz": {
+            "id": "Foo-Baz",
+            "properties": {
+                "b": {
+                    "type": "string"
+                }
+            }
+        },
+        "Bar-Baz": {
+            "id": "Bar-Baz",
+            "properties": {
+                "a": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

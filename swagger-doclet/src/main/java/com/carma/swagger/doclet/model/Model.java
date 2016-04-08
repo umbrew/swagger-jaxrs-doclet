@@ -19,7 +19,7 @@ public class Model {
 	private List<String> requiredFields;
 	private List<String> optionalFields;
 	private List<String> subTypes;
-        private boolean isModelSubtype;
+  private boolean isModelSubtype;
 	private String discriminator;
 
 	/**

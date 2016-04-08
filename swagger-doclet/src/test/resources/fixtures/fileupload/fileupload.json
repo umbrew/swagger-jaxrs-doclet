@@ -4,7 +4,7 @@
     "basePath": "http://localhost:8080",
     "resourcePath": "/fileupload",
     "apis": [
-    	{
+        {
             "path": "/fileupload/bytearraymultipart",
             "operations": [
                 {
@@ -20,12 +20,12 @@
                         }
                     ],
                     "consumes": [
-                    	"multipart/form-data"
+                        "multipart/form-data"
                     ]
                 }
             ]
         },
-    	{
+        {
             "path": "/fileupload/bytearraysinglepart",
             "operations": [
                 {
@@ -36,12 +36,16 @@
                         {
                             "paramType": "body",
                             "name": "payload",
-                            "type": "ByteArray",
+                            "type": "array",
+                            "items": {
+                                "type" : "string",
+                                "format" : "byte"
+                            },
                             "required" : true
                         }
                     ],
                     "consumes": [
-                    	"application/octet-stream"
+                        "application/octet-stream"
                     ]
                 }
             ]
@@ -66,7 +70,7 @@
                         }
                     ],
                     "consumes": [
-                    	"application/x-www-form-urlencoded"
+                        "application/x-www-form-urlencoded"
                     ]
                 }
             ]
@@ -92,12 +96,12 @@
                         }
                     ],
                     "consumes": [
-                    	"multipart/form-data"
+                        "multipart/form-data"
                     ]
                 }
             ]
         },
-    	{
+        {
             "path": "/fileupload/multipartjavafile",
             "operations": [
                 {
@@ -113,7 +117,7 @@
                         }
                     ],
                     "consumes": [
-                    	"multipart/form-data","application/octet-stream"
+                        "multipart/form-data","application/octet-stream"
                     ]
                 }
             ]
@@ -134,7 +138,7 @@
                         }
                     ],
                     "consumes": [
-                    	"multipart/form-data"
+                        "multipart/form-data"
                     ]
                 }
             ]
@@ -155,7 +159,7 @@
                         }
                     ],
                     "consumes": [
-                    	"image/*"
+                        "image/*"
                     ]
                 }
             ]
@@ -176,7 +180,7 @@
                         }
                     ],
                     "consumes": [
-                    	"image/*"
+                        "image/*"
                     ]
                 }
             ]

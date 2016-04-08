@@ -19,7 +19,26 @@ This is used as a basis for the [Carma API Reference](https://api-dev.car.ma/api
 
 ## Versions
 
-The latest production version is 1.0.4.2
+1.1.x Versions and higher require Java 8
+1.0.x Versions require Java 6/7
+
+The latest production version is 1.0.5
+1.0.5 contains many fixes and feature requests since the previous release.
+
++ Added better support for subTypes - courtesy of @mhardorf (Issue 86)
++ Class PathParam Variables Not Being Added as Required Parameters to JSON Output - big help from @nkoterba (Issue 74)
++ Add support for data type format (Issue 84)
++ Support not including private model fields by default via -defaultModelFieldsXmlAccessType flag (Issue 85) 
++ Support BigDecimal and BigInteger (Issue 87)
++ Support allowable values javadoc tag (Issue 89)
++ Update Documentation for Gradle Users in Resolving Models - courtesy of @nkoterba (Issue 82)
++ Type identification does not work properly when mixing array types / regular types (Issue 81)
++ Provide includeResourcePrefixes Configuration Option (Issue 80)
++ @responseType doesn't support primitives (Issue 76)
++ Issue Creating Paths with Regex Expressions - big help from @nkoterba (Issue 73)
++ Model generation does not work properly for collections in some cases (Issue 72)
++ Support for array types (Issue 71)
++ @responseType ignored where method signature specifies generic return type (Issue 69)
 
 1.0.4.2 is a patch release of the 1.0.4 version to fix two additional bugs in the 1.0.4 release:
 
@@ -112,9 +131,9 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
                             <doclet>com.carma.swagger.doclet.ServiceDoclet</doclet>
                             <docletArtifact>
                                 <groupId>com.carma</groupId>
-								<artifactId>swagger-doclet</artifactId>
-        						<version>1.0.4.2</version>
-        					</docletArtifact>
+                                <artifactId>swagger-doclet</artifactId>
+                                <version>1.0.5.1</version>
+                            </docletArtifact>
                             <reportOutputDirectory>${project.build.outputDirectory}</reportOutputDirectory>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
                             <additionalparam>-apiVersion 1 -docBasePath http://myapi -apiBasePath http://myapi</additionalparam>
@@ -150,7 +169,7 @@ Here is an example build.gradle file that will generate the swagger JSON files i
 
 dependencies {
     doclet(
-        [group: 'com.carma', name: 'swagger-doclet', version: '1.0.4.2'],
+        [group: 'com.carma', name: 'swagger-doclet', version: '1.0.5.1'],
         [group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0']
     ) 
 }
@@ -168,10 +187,68 @@ dependencies {
 }
 ```
 
+#### Including Model Classes from outside the doclet project
+Thanks to @nkoterba for these gradle instructions described in issue 82.
+There are two solutions:
+
+**Solution 1**
+For those **not** using Intelli-J, you can just define a sourceset that points to the source of your current project where the Doclet plugin is run + any Model projects:
+
+```
+sourceSets {
+    doclet {
+        java {
+            srcDir 'src/main/java'
+            // List all the source project directories where we define
+            // Models that will be used by Doclet to generate REST API Docs
+            srcDir project(":code:models:api").file("src/main/java")
+        }
+    }
+}
+```
+
+Then update your task that generates the REST API Docs from:
+```
+source = sourceSets.main.allJava
+```
+
+to:
+```
+source = sourceSets.doclet.allJava
+```
+
+**Solution 2**
+Unfortunately, if you are using Intelli-J, it's Gradle Sync/Plugin will complain if you define a SourceSet with sources outside of your project. See: https://youtrack.jetbrains.com/issue/IDEA-122577#tab=Comments
+
+So instead, you have to "manually" build your source set:
+
+```
+task generateRestApiDocs(type: Javadoc) {
+    // Ideally would use a custom-defined source set above
+    // However, Intelli-J can't handle Sources out of content root
+    // See: https://youtrack.jetbrains.com/issue/IDEA-122577#tab=Comments
+    // and: https://github.com/spockframework/spock/issues/70
+    // So instead "manually" creating the source set
+
+    def sourceList = new ArrayList<File>()
+
+    sourceList.addAll(sourceSets.main.allJava);
+    project(":code:models:api").fileTree("src/main/java").each {
+        sourceList.add(it)
+    }
+
+    source = sourceList
+    options.classpath = configurations.doclet.files.asType(List)
+    options.docletpath = configurations.doclet.files.asType(List)
+
+   // ... Rest of doclet setup/configuration here
+   
+```
+
 ### Usage Notes
 The settings that you use for the doc base path and the api base path will vary depending on both the version of swagger that is used and the name used for your top level resource listing. Please refer to the Doclet Options section of this document for a detailed description of these. 
 
-The doclet will generate a service.json file which is the swagger spec resource listing and will also generate a series of resource json files. To use the swagger ui with the generated json files you can either use the swagger ui that is embedded with this doclet (currently 2.0.24) or use your own which is recommended for most people as it allows you to tweak the look and feel.
+The doclet will generate a service.json file which is the swagger spec 1.2 resource listing and will also generate a series of resource json files. To use the swagger ui with the generated json files you can either use the swagger ui that is embedded with this doclet (currently 2.1.8-M1) or use your own which is recommended for most people as it allows you to tweak the look and feel.
 
 
 You would then add various javadoc tags to your source code to fine tune the generated documentation.
@@ -267,6 +344,8 @@ Note: If you are using a snapshot version then these are deployed in the sonatyp
 	
 	<tr><td>@summary</td><td>This is used for the summary of the operation. If you do not use this then the summary will be taken from the first sentences of the javadoc.</td><td>operations</td><td>@endpointName</td></tr>
 	
+	<tr><td>@format</td><td>Defines the format for a model field. Note that this is only used for types that do not already map to a predefined format; which primarily means string type.</td><td>model fields and methods</td><td></td></tr>
+	
 	<tr><td>@min</td><td>Defines a minimum value for a model field.</td><td>model fields and methods</td><td>@minimum</td></tr>
 	<tr><td>@max</td><td>Defines a maximum value for a model field.</td><td>model fields and methods</td><td>@maximum</td></tr>
 	
@@ -282,15 +361,19 @@ Note: If you are using a snapshot version then these are deployed in the sonatyp
 	
 	<tr><td>@csvParams</td><td>Defines a csv of operation parameter names that use CSV values. For swagger 1.2 this results in the allowMultiple field being set to true, however the Swagger UI does not support this at present. NOTE: The values for the name of the parameter in this CSV must be the raw name in the method signature/bean param field not the name as derived via an annotation or javadoc tag.</td><td>operations</td><td></td></tr>
 	
+	<tr><td>@paramsFormat</td><td>Defines the format for one or more of the parameters of an operation. This uses a format of space separated name and value pairs e.g.  param1Name param1Format param2Name param2Format. Note that this is only used for types that do not already map to a predefined format; which primarily means string type. NOTE2: The values for the name of the parameter in this CSV must be the raw name in the method signature/bean param field not the name as derived via an annotation or javadoc tag.</td><td>operations</td><td>@formats</td></tr>
+	
 	<tr><td>@paramsMinValue</td><td>Defines the minimum value for one or more of the parameters of an operation. This uses a format of space separated name and value pairs e.g.  param1Name param1MinValue param2Name param2MinValue. NOTE: The values for the name of the parameter in this CSV must be the raw name in the method signature/bean param field not the name as derived via an annotation or javadoc tag.</td><td>operations</td><td>@paramsMinimumValue, @minValues</td></tr>
 	
 	<tr><td>@paramsMaxValue</td><td>Defines the maximum value for one or more of the parameters of an operation. This uses a format of space separated name and value pairs e.g.  param1Name param1MaxValue param2Name param2MaxValue. NOTE: The values for the name of the parameter in this CSV must be the raw name in the method signature/bean param field not the name as derived via an annotation or javadoc tag.</td><td>operations</td><td>@paramsMaximumValue, @maxValues</td></tr>
 	
 	<tr><td>@paramsDefaultValue</td><td>Defines the default value for one or more of the parameters of an operation. This uses a format of space separated name and value pairs e.g.  param1Name param1DefaultValue param2Name param2DefaultValue. This doclet also supports reading default values from the JAXRS DefaultValue annotation which takes precedence over this for a given parameter. For enums a default value must be one of the enum values, for numeric types if there is a minimum value then a default value must be >= to it, similarly if there is a maximum value then a default value must be <= to it. NOTE: The values for the name of the parameter in this CSV must be the raw name in the method signature/bean param field not the name as derived via an annotation or javadoc tag.</td><td>operations</td><td>@defaultValues</td></tr>
 	
+	<tr><td>@paramsAllowableValues</td><td>Defines the allowable values for one or more of the parameters of an operation. This uses a format of space separated name and value pairs e.g.  param1Name param1AllowableValue1 param1Name param1AllowableValue2 param2Name param2AllowableValue1 etc. A default value must be one of these allowable values. NOTE: The values for the name of the parameter in this CSV must be the raw name in the method signature/bean param field not the name as derived via an annotation or javadoc tag.</td><td>operations</td><td>@allowableValues</td></tr>
+	
 	<tr><td>@paramsNameValue</td><td>Defines custom names for one or more of the parameters of an operation. This uses a format of space separated name and value pairs e.g.  param1Name param1CustomName param2Name param2CustomName. NOTE: The values for the name of the parameter in this CSV must be the raw name in the method signature/bean param field not the name as derived via an annotation or javadoc tag.</td><td>operations</td><td>@overrideParamsName</td></tr>
 	
-	<tr><td>@resourcePath</td><td>This sets the path for resources in the resource listing e.g. the service.json file. You should put this tag on either a) the resource class if using a single resource class per api resource, or b) one of the operation methods of each resource if you have endpoints from multiple resources in the same class file. NOTE if you have resource classes with empty paths or a path that is / then by default these classes will be give the resource path of /root, if you put @resourcePath on the class this will be used instead of /root. You can also use the doclet parameter -resourcePath to customize the resource path for root resources.</td><td>operations, resource classes</td><td>@resource,@parentEndpointName</td></tr>
+	<tr><td>@resourcePath</td><td>This sets the path for resources in the resource listing e.g. the service.json file. This does NOT impact the api path which is soley controlled via the @Path annotations. You should put this tag on either a) the resource class if using a single resource class per api resource, or b) one of the operation methods of each resource if you have endpoints from multiple resources in the same class file. NOTE if you have resource classes with empty paths or a path that is / then by default these classes will be give the resource path of /root, if you put @resourcePath on the class this will be used instead of /root. You can also use the doclet parameter -resourcePath to customize the resource path for root resources.</td><td>operations, resource classes</td><td>@resource,@parentEndpointName</td></tr>
 	
 	<tr><td>@resourceDescription</td><td>This sets the description for an operation in the resource listing e.g. the service.json file. You should put this tag on either the resource class, if using a single resource class per api resource, or one of the operation methods of each resource, if you have endpoints from multiple resources in the same class file.</td><td>operations, resource classes</td><td></td></tr>
 	
@@ -314,7 +397,7 @@ These are the options that you will always want to set
 	<tr><th>Option</th><th>Purpose</th></tr>
 	<tr><td>-docBasePath</td><td><p>The base path to the docs in the service.json. You should set to the url of the dir where the swagger json files are hosted e.g. for Carma we use -docBasePath https://api-dev.car.ma/apidoc/ref. If you dont want to build different json files for each server environment one solution which we use at Carma is to use a variable reference for the docBasePath and then serve the json file(s) through a servlet filter which can replace the variable with the hostname of the server it is running on. Alternatively you can use a relative path use the workaround described below (this is technically against the swagger 1.2 spec).</p><p>NOTE: Do not end this with a forward slash.</p>
 	<p>NOTE 2: Technically as per the swagger 1.2 spec the doc base path which is in the resource listing file is NOT required, however, if it is not specified the swagger ui will only work if the resource listing file is in one directory and the url in the index.html points to this and the other resource json files are relative to this. This doclet generates the resource listing as a file called service.json and the resource json files are generated in the same directoy. You can of course name the files and move them to a structure similar to the swagger petstore example where the resource listing is in at the path /api-docs and the resources are under this such as /api-docs/Users.json or you can use web server rewrites to simulate this structure.</p>
-	<p>NOTE 3: If you want to use a relative docBasePath then you will need to patch the swagger.js file of the swagger ui to support this. This is because according to the 1.2 spec the docBasePath is supposed to be absolute. <b>The swagger.js (from v 2.0.24 of the swagger ui) which is bundled with the doclet has this patch since version 1.0.1.</b></p>
+	<p>NOTE 3: If you want to use a relative docBasePath then you will need to patch the swagger.js file of the swagger ui to support this. This is because according to the 1.2 spec the docBasePath is supposed to be absolute. <b>The swagger.js which is bundled with the doclet has this patch.</b></p>
 	<p>The patch to apply for relative doc base url is as follows:
 <pre>
 <code>
@@ -353,34 +436,6 @@ if (response.basePath)
   //END PATCH to support relative base url in the top level resource listing
   ...
   
-</code>
-</pre>
-</p>
-	<p>NOTE 4: If you want to use a relative path that has a port in the url such as 8080 then you must also patch the shred.bundle.js file of the swagger ui. <b>The shred.bundle.js (from v 2.0.24 of the swagger ui) that is bundled with this doclet has this patch since version 1.0.1.</b></p> 
-<p>The patch to apply for ports is as follows:
-<pre>
-<code>
-port: {
-    get: function() {
-      if (!this._port) {
-    	// BEGIN Patch to support relative doc base path
-    	// use the port of the URI if available
-    	var port = document.URL.match(/:(\d+)\//);
-    	if (port) {
-    	  return this._port = port[2];
-    	}
-    	// END Patch to support relative doc base path
-        switch(this.scheme) {
-          case "https": return this._port = 443;
-          case "http":
-          default: return this._port = 80;
-        }
-      }
-      return this._port;
-    },
-    set: function(value) { this._port = value; return this; },
-    enumerable: true
-  },
 </code>
 </pre>
 </p>
@@ -591,13 +646,17 @@ Then the variable ${userFieldNamesDesc} would be replaced by the value from the 
 	
 	<tr><td>-excludeModelPrefixes</td><td>This adds additional classes to the set of model classes that are NOT documented. The default set contains org.joda.time.DateTime, java.util.UUID, java.io. . This supports a full class name as well as prefixes of the fully qualified class names which means you can enter a package like com.foo to exclude all classes under the com.foo package. This replaces the -typesToTreatAsOpaque option but if that option is specified then those classes will be added to the excludeModelPrefixes set.</td></tr>
 	
-	<tr><td>-excludeResourcePrefixes</td><td>This allows you to exclude resource classes from the generated documentation. This supports a full class name as well as prefixes of the fully qualified class names which means you can enter a package like com.foo to exclude all classes under the com.foo package.</td></tr>
+	<tr><td>-excludeResourcePrefixes</td><td>This allows you to exclude resource classes from the generated documentation. It is a CSV and supports a full class name as well as prefixes of the fully qualified class names which means you can enter a package like com.foo to exclude all classes under the com.foo package.</td></tr>
+	
+	<tr><td>-includeResourcePrefixes</td><td>This allows you to ONLY include resource classes from the generated documentation that match this. It is a CSV and supports a full class name as well as prefixes of the fully qualified class names which means you can enter a package like com.foo to include only classes under the com.foo package. You can use the excludeResourcePrefixes in conjunction with this to exclude specific classes/packages within the included set.</td></tr>
 	
 	<tr><td>-genericWrapperTypes</td><td>This adds additional classes to the set of model classes that act as genericized wrappers to the actual entity or parameter that should be documented. The default set contains com.sun.jersey.api.JResponse, com.google.common.base.Optional, jersey.repackaged.com.google.common.base.Optional</td></tr>
 	
 	<tr><td>-modelFieldsRequiredByDefault</td><td>This is whether model fields are required by default e.g. if a model field has neither @optional or @required on it. If you do not set this then model fields are NOT required by default. If you set this option then they ARE required by default.</td></tr>
 	
 	<tr><td>-disableModelFieldsXmlAccessType</td><td>By default the doclet will use @XmlAccessorType to decide which model fields to generate. To disable this option you can set this parameter which will mean all model fields and getters will generate properties apart from static and transient ones.</td></tr>
+	
+	<tr><td>-defaultModelFieldsXmlAccessType</td><td>By default the doclet WILL include private fields in generated documentation even if disableModelFieldsXmlAccessType is false. This is because many users expect this behaviour and instead prefer to mark fields to exclude using transient and other javadoc tags. If you DO want default behaviour of fields to be per the JAXB spec e.g. XmlAccessType.PUBLIC_MEMBER then set this flag.</td></tr>
 	
 	<tr><td>-modelFieldsNamingConvention</td><td>This is an optional naming convention that can be used for the naming of fields of models. If not specified then the fields of models will have the same name as the java field name unless it has one of the annotations that can override the name such as @XmlAttribute, @XmlElement or @JsonProperty. There are 3 types of naming conventions that can be used instead: lower case, upper case, and lower case with underscore separating words. For each of these they can be used either always or only when there is no name customising annotation/tag (such as @XmlAttribute). The supported values for this field are: LOWER_UNDERSCORE, UPPERCASE, LOWERCASE which always take effect or their equivalents which only apply when there is not customised name for the field are: LOWER_UNDERSCORE_UNLESS_OVERRIDDEN, UPPERCASE_UNLESS_OVERRIDDEN, LOWERCASE_UNLESS_OVERRIDDEN, </td></tr>
 	
@@ -654,6 +713,8 @@ These are options that you typically won't need to use unless for example, you w
 	
 	<tr><td>-fieldDescriptionTags</td><td>This adds additional tags to the list of javadoc tags used for setting the description of model field/methods. The default list contains description, comment, return. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
 	
+	<tr><td>-fieldFormatTags</td><td>This adds additional tags to the list of javadoc tags used for setting the format of a model field. The default list contains format. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
+	
 	<tr><td>-fieldMinTags</td><td>This adds additional tags to the list of javadoc tags used for setting the min value of a model field. The default list contains min, minimum. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
 	
 	<tr><td>-fieldMaxTags</td><td>This adds additional tags to the list of javadoc tags used for setting the max value of a model field. The default list contains max, maximum. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
@@ -676,9 +737,15 @@ These are options that you typically won't need to use unless for example, you w
 	
 	<tr><td>-csvParamsTags</td><td>This adds additional tags to the list of javadoc tags used for setting whether operation parameters are csv/multi valued. The default list contains csvParams. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
 	
+	<tr><td>-paramsFormatTags</td><td>This adds additional tags to the list of javadoc tags used for setting formats for operation parameters. The default list contains paramsFormat, formats. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
+	
 	<tr><td>-paramsMinValueTags</td><td>This adds additional tags to the list of javadoc tags used for setting minimum values for operation parameters. The default list contains paramsMinValue, paramsMinimumValue, minValues. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
 	
 	<tr><td>-paramsMaxValueTags</td><td>This adds additional tags to the list of javadoc tags used for setting maximum values for operation parameters. The default list contains paramsMaxValue, paramsMaximumValue, maxValues. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
+	
+	<tr><td>-paramsDefaultValueTags</td><td>This adds additional tags to the list of javadoc tags used for setting default values for operation parameters. The default list contains paramsDefaultValue, defaultValues. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
+	
+	<tr><td>-paramsAllowableValuesTags</td><td>This adds additional tags to the list of javadoc tags used for setting allowable values for operation parameters. The default list contains paramsAllowableValues, allowableValues. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
 	
 	<tr><td>-requiredFieldTags</td><td>This adds additional tags to the list of javadoc tags used for setting whether model fields are required. The default list contains required and requiredField. NOTE: The values in the doclet option should NOT have the @ symbol on them.</td></tr>
 	
@@ -733,22 +800,22 @@ An example project using Dropwizard is included in `swagger-doclet-sample-dropwi
 ```
 $ cd swagger-doclet-sample-dropwizard
 $ mvn package
-$ java -jar target/swagger-doclet-sample-dropwizard-1.0.jar server sample.yml
+$ java -jar target/swagger-doclet-sample-dropwizard*.jar server sample.yml
 ```
 
-The example server should be running on port 8080:
+The example server should be running on port 7070:
 
-You can view the Swagger UI running here: [http://127.0.0.1:8080/apidocs/](http://127.0.0.1:8080/apidocs/)
+You can view the Swagger UI running here: [http://127.0.0.1:7070/apidocs/](http://127.0.0.1:7070/apidocs/)
 NOTE you need to add the trailing forward slash for the CSS to load.
 
 You can also inspect the generated json:
 
 ```
-$ curl localhost:8080/apidocs/service.json
+$ curl localhost:7070/apidocs/service.json
 {
   "swaggerVersion" : "1.2",
   "apiVersion" : "1",
-  "basePath" : "http://127.0.0.1:8080/apidocs",
+  "basePath" : "http://127.0.0.1:7070/apidocs",
   "apis" : [ {
     "path" : "/Response.{format}"
   }, {

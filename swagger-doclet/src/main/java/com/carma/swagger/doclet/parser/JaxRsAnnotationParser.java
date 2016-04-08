@@ -35,13 +35,20 @@ import com.sun.javadoc.Type;
 @SuppressWarnings("javadoc")
 public class JaxRsAnnotationParser {
 
-	private static final String SWAGGER_VERSION = "1.2";
 	// swagger 1.1 spec see https://groups.google.com/forum/#!topic/swagger-swaggersocket/mHdR9u0utH4
 	// diffs between 1.1 and 1.2 see https://github.com/wordnik/swagger-spec/wiki/1.2-transition
-	private static final String SWAGGER_UI_VERSION = "2.0.24";
+	private static final String SWAGGER_VERSION = "1.2";
+
+	private static final String SWAGGER_UI_VERSION = "2.1.8-M1";
 
 	private final DocletOptions options;
 	private final RootDoc rootDoc;
+
+	private static final <T> void addIfNotNull(Collection<T> collection, T item) {
+		if (item != null) {
+			collection.add(item);
+		}
+	}
 
 	public JaxRsAnnotationParser(DocletOptions options, RootDoc rootDoc) {
 		this.options = options;
@@ -53,18 +60,20 @@ public class JaxRsAnnotationParser {
 
 			// setup additional classes needed for processing, generally these are java ones such as java.lang.String
 			Collection<ClassDoc> typeClasses = new ArrayList<ClassDoc>();
-			typeClasses.add(this.rootDoc.classNamed("java.lang.String"));
-			typeClasses.add(this.rootDoc.classNamed("java.lang.Integer"));
-			typeClasses.add(this.rootDoc.classNamed("java.lang.Boolean"));
-			typeClasses.add(this.rootDoc.classNamed("java.lang.Float"));
-			typeClasses.add(this.rootDoc.classNamed("java.lang.Double"));
-			typeClasses.add(this.rootDoc.classNamed("java.lang.Character"));
-			typeClasses.add(this.rootDoc.classNamed("java.lang.Long"));
-			typeClasses.add(this.rootDoc.classNamed("java.lang.Byte"));
-			typeClasses.add(this.rootDoc.classNamed("java.util.Map"));
-			typeClasses.add(this.rootDoc.classNamed("java.util.Collection"));
-			typeClasses.add(this.rootDoc.classNamed("java.util.Set"));
-			typeClasses.add(this.rootDoc.classNamed("java.util.List"));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.lang.String.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.lang.Integer.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.lang.Boolean.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.lang.Float.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.lang.Double.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.lang.Character.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.lang.Long.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.lang.Byte.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.util.Map.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.util.Collection.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.util.Set.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.util.List.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.math.BigInteger.class.getName()));
+			addIfNotNull(typeClasses, this.rootDoc.classNamed(java.math.BigDecimal.class.getName()));
 
 			// filter the classes to process
 			Collection<ClassDoc> docletClasses = new ArrayList<ClassDoc>();
@@ -91,6 +100,20 @@ public class JaxRsAnnotationParser {
 						}
 					}
 				}
+
+				// see if the inclusion filter is set and if so this resource must match this
+				if (!excludeResource && this.options.getIncludeResourcePrefixes() != null && !this.options.getIncludeResourcePrefixes().isEmpty()) {
+					boolean matched = false;
+					for (String prefix : this.options.getIncludeResourcePrefixes()) {
+						String className = classDoc.qualifiedName();
+						if (className.startsWith(prefix)) {
+							matched = true;
+							break;
+						}
+					}
+					excludeResource = !matched;
+				}
+
 				if (excludeResource) {
 					continue;
 				}
@@ -226,9 +249,10 @@ public class JaxRsAnnotationParser {
 		for (ApiDeclaration api : apis) {
 			String resourcePath = api.getResourcePath();
 			if (!Strings.isNullOrEmpty(resourcePath)) {
-				String resourceName = resourcePath.replaceFirst("/", "").replaceAll("/", "_").replaceAll("[\\{\\}]", "");
-				resources.add(new ResourceListingAPI("/" + resourceName + ".{format}", api.getDescription()));
-				File apiFile = new File(outputDirectory, resourceName + ".json");
+				// make sure the filename for the resource is valid
+				String resourceFile = ParserHelper.generateResourceFilename(resourcePath);
+				resources.add(new ResourceListingAPI("/" + resourceFile + ".{format}", api.getDescription()));
+				File apiFile = new File(outputDirectory, resourceFile + ".json");
 				recorder.record(apiFile, api);
 			}
 		}

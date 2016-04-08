@@ -96,17 +96,7 @@
         "Parameterized": {
             "id": "Parameterized",
             "properties": {
-                "typedCol": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "rtype": {
-                    "type": "integer",
-                    "format" : "int32"
-                },
-                "object": {
+            	"object": {
                     "type": "Object"
                 },
                 "typed": {
@@ -114,6 +104,17 @@
                 },
                 "parameterizedChild": {
                     "type": "Parameterized2"
+                },
+                "typedCol": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format" : "int32"
+                    }
+                },
+                "rtype": {
+                    "type": "integer",
+                    "format" : "int32"
                 }
             }
         },

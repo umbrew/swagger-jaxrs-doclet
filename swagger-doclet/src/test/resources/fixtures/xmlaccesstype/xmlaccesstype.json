@@ -4,6 +4,24 @@
     "basePath": "http://localhost:8080",
     "resourcePath": "/xmlaccesstype",
     "apis": [
+    	{
+            "path": "/xmlaccesstype/defaultaccess",
+            "operations": [
+                {
+                    "method": "POST",
+                    "nickname": "postDefaultAccess",
+                    "type": "DefaultAccessPojo",
+                    "parameters": [
+                        {
+                            "paramType": "body",
+                            "name": "data",
+                            "type": "DefaultAccessPojo",
+                            "required" : true
+                        }
+                    ]
+                }
+            ]
+        },
         {
             "path": "/xmlaccesstype/fieldaccess",
             "operations": [
@@ -78,27 +96,35 @@
         }
     ],
     "models": {
-        "FieldAccessPojo": {
-            "id": "FieldAccessPojo",
+    	"DefaultAccessPojo": {
+            "id": "DefaultAccessPojo",
             "properties": {
-                "value1": {
-                    "type": "string"
-                },
-                "value2": {
-                    "type": "string"
-                },
-                "value3": {
-                    "type": "string"
-                },
-                "value4": {
-                    "type": "string"
-                },
-                "value9": {
+                "foo": {
                     "type": "string"
                 }
             }
         },
-        "NoneAccessPojo": {
+    	"PublicAccessPojo": {
+            "id": "PublicAccessPojo",
+            "properties": {
+            	"value7": {
+                    "type": "string"
+                },
+                "value8": {
+                    "type": "string"
+                },
+                "value9": {
+                    "type": "string"
+                },
+                "value10": {
+                    "type": "string"
+                },
+                "value11": {
+                    "type": "string"
+                }
+            }
+        },
+    	"NoneAccessPojo": {
             "id": "NoneAccessPojo",
             "properties": {
             	"value10": {
@@ -124,10 +150,19 @@
                 }
             }
         },
-        "PropertyAccessPojo": {
-            "id": "PropertyAccessPojo",
+        "FieldAccessPojo": {
+            "id": "FieldAccessPojo",
             "properties": {
-                "value8": {
+                "value1": {
+                    "type": "string"
+                },
+                "value2": {
+                    "type": "string"
+                },
+                "value3": {
+                    "type": "string"
+                },
+                "value4": {
                     "type": "string"
                 },
                 "value9": {
@@ -135,22 +170,13 @@
                 }
             }
         },
-        "PublicAccessPojo": {
-            "id": "PublicAccessPojo",
+        "PropertyAccessPojo": {
+            "id": "PropertyAccessPojo",
             "properties": {
-            	"value7": {
-                    "type": "string"
-                },
                 "value8": {
                     "type": "string"
                 },
                 "value9": {
-                    "type": "string"
-                },
-                "value10": {
-                    "type": "string"
-                },
-                "value11": {
                     "type": "string"
                 }
             }

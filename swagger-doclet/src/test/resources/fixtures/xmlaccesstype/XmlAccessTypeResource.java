@@ -36,4 +36,9 @@ public class XmlAccessTypeResource {
 		return data;
 	}
 
+	@POST
+	@Path("/defaultaccess")
+	public DefaultAccessPojo postDefaultAccess(DefaultAccessPojo data) {
+		return data;
+	}
 }

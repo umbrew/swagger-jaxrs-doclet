@@ -3,9 +3,6 @@ package com.carma.swagger.doclet.translator;
 import static com.carma.swagger.doclet.translator.Translator.OptionalName.ignored;
 import static com.carma.swagger.doclet.translator.Translator.OptionalName.presentOrMissing;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.carma.swagger.doclet.DocletOptions;
 import com.carma.swagger.doclet.parser.AnnotationParser;
 import com.carma.swagger.doclet.parser.ParserHelper;
@@ -23,8 +20,6 @@ import com.sun.javadoc.Type;
  */
 public class AnnotationAwareTranslator implements Translator {
 
-	private final Map<QualifiedType, OptionalName> typeNameCache;
-
 	private String ignore;
 	private String element;
 	private String elementProperty;
@@ -38,7 +33,6 @@ public class AnnotationAwareTranslator implements Translator {
 	 */
 	public AnnotationAwareTranslator(DocletOptions options) {
 		this.options = options;
-		this.typeNameCache = new HashMap<QualifiedType, OptionalName>();
 	}
 
 	/**
@@ -100,23 +94,18 @@ public class AnnotationAwareTranslator implements Translator {
 		if (paramType == null) {
 			paramType = parameter.type();
 		}
-		QualifiedType cacheKey = new QualifiedType(String.valueOf(multipart), paramType);
-
-		if (this.typeNameCache.containsKey(cacheKey)) {
-			return this.typeNameCache.get(cacheKey);
-		}
+		QualifiedType type = new QualifiedType(String.valueOf(multipart), paramType);
 
 		// look for File data types
 		if (multipart) {
 			boolean isFileDataType = ParserHelper.isFileParameterDataType(parameter, this.options);
 			if (isFileDataType) {
 				OptionalName res = presentOrMissing("File");
-				this.typeNameCache.put(cacheKey, res);
 				return res;
 			}
 		}
 
-		return typeName(cacheKey);
+		return typeName(type);
 	}
 
 	/**
@@ -128,16 +117,17 @@ public class AnnotationAwareTranslator implements Translator {
 	}
 
 	private OptionalName typeName(QualifiedType type) {
-		if (this.typeNameCache.containsKey(type)) {
-			return this.typeNameCache.get(type);
-		}
 
 		if (ParserHelper.isPrimitive(type.getType(), this.options) || type.getType().asClassDoc() == null) {
 			return null;
 		}
 
-		OptionalName name = nameFor(this.rootElement, this.rootElementProperty, type.getType().asClassDoc(), false);
-		this.typeNameCache.put(type, name);
+		OptionalName name = null;
+		if (ParserHelper.isArray(type.getType())) {
+			name = presentOrMissing("array");
+		} else {
+			name = nameFor(this.rootElement, this.rootElementProperty, type.getType().asClassDoc(), false);
+		}
 		return name;
 	}
 

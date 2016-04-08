@@ -10,7 +10,8 @@
                 {
                     "method": "GET",
                     "nickname": "get",
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time"
                 },
                 {
                     "method": "POST",

@@ -29,6 +29,7 @@ public class ApiParameter extends Property {
 	 * @param description
 	 * @param itemsRef
 	 * @param itemsType
+	 * @param itemsFormat
 	 * @param uniqueItems
 	 * @param allowableValues
 	 * @param minimum
@@ -36,8 +37,9 @@ public class ApiParameter extends Property {
 	 * @param defaultValue
 	 */
 	public ApiParameter(String paramCategory, String name, Boolean required, Boolean allowMultiple, String type, String format, String description,
-			String itemsRef, String itemsType, List<String> itemsAllowableValues, Boolean uniqueItems, List<String> allowableValues, String minimum, String maximum, String defaultValue) {
-		super(name, paramCategory, type, format, description, itemsRef, itemsType, itemsAllowableValues, uniqueItems, allowableValues, minimum, maximum, defaultValue);
+			String itemsRef, String itemsType, String itemsFormat, Boolean uniqueItems, List<String> allowableValues, String minimum, String maximum,
+			String defaultValue) {
+		super(name, paramCategory, type, format, description, itemsRef, itemsType, itemsFormat, uniqueItems, allowableValues, minimum, maximum, defaultValue);
 		this.paramType = paramCategory;
 		this.name = name;
 		this.required = required;

@@ -40,6 +40,40 @@
                 },
                 {
                     "method": "GET",
+                    "nickname": "responseString",
+                    "type": "string"
+                },
+                {
+                    "method": "GET",
+                    "nickname": "responseStringObject",
+                    "type": "string"
+                },
+                {
+                    "method": "GET",
+                    "nickname": "responseInt",
+                    "type": "integer",
+                    "format" : "int32"
+                },
+                {
+                    "method": "GET",
+                    "nickname": "responseIntObject",
+                    "type": "integer",
+                    "format" : "int32"
+                },
+                {
+                    "method": "GET",
+                    "nickname": "responseBigIntObject",
+                    "type": "integer",
+                    "format" : "int64"
+                },
+                {
+                    "method": "GET",
+                    "nickname": "responseBigDecObject",
+                    "type": "number",
+                    "format" : "double"
+                },
+                {
+                    "method": "GET",
                     "nickname": "responseDefinedViaResponseCode",
                     "type": "Response",
                     "responseMessages": [

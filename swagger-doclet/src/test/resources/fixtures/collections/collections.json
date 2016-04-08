@@ -49,6 +49,28 @@
             ]
         },
         {
+        	"path": "/collections/listofints",
+            "operations": [
+               {
+                    "method": "POST",
+                    "nickname": "setListOfInts",
+                    "type": "void",
+                    "parameters": [
+                        {
+                            "paramType": "body",
+                            "name": "items",
+                            "type": "array",
+                            "items": {
+                    			"type": "integer",
+                            	"format": "int32"
+                    		},
+                    		"required" : true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
         	"path": "/collections/listofitems",
             "operations": [
                {
