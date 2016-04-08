@@ -822,7 +822,7 @@ public class ApiModelParser {
 			}
 			String containerTypeOf = containerOf == null ? null : this.translator.typeName(containerOf).value();
 			if (containerOf != null) {
-                itemsAllowableValues = ParserHelper.getAllowableValues(containerOf.asClassDoc());
+                List<String> itemsAllowableValues = ParserHelper.getAllowableValues(containerOf.asClassDoc());
                 if (itemsAllowableValues != null) {
                     itemsType = "string";
                 } else {
